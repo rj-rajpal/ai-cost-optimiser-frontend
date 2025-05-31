@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Header from '../../components/ui/Header';
-import Sidebar from '../../components/ui/Sidebar';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import { useToast, ToastContainer } from '../../components/ui/Toast';
 import UploadZone from './components/UploadZone';
@@ -9,7 +8,6 @@ import UploadGuidelines from './components/UploadGuidelines';
 import DataPreview from './components/DataPreview';
 
 const DataUpload = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [uploadHistory, setUploadHistory] = useState([
     {
       id: 1,
@@ -55,14 +53,6 @@ const DataUpload = () => {
   const [activeUploads, setActiveUploads] = useState([]);
   const [previewData, setPreviewData] = useState(null);
   const { toasts, removeToast, showSuccess, showError, showWarning } = useToast();
-
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const handleSidebarClose = () => {
-    setIsSidebarOpen(false);
-  };
 
   const handleFileUpload = (files) => {
     const newUploads = Array.from(files).map(file => ({
@@ -246,10 +236,9 @@ const DataUpload = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onSidebarToggle={handleSidebarToggle} isSidebarOpen={isSidebarOpen} />
-      <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
+      <Header />
       
-      <main className="lg:ml-64 pt-16">
+      <main className="pt-16">
         <div className="p-6">
           {/* Page Header */}
           <div className="mb-8">

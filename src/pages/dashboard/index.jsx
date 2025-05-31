@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
-import Sidebar from '../../components/ui/Sidebar';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Icon from '../../components/AppIcon';
 import MetricTile from './components/MetricTile';
@@ -10,7 +9,6 @@ import TopProcesses from './components/TopProcesses';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [chartType, setChartType] = useState('area');
   const [timeRange, setTimeRange] = useState('30d');
 
@@ -127,14 +125,6 @@ const Dashboard = () => {
     }
   ];
 
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const handleSidebarClose = () => {
-    setIsSidebarOpen(false);
-  };
-
   const handleQuickAction = (action, processId) => {
     switch (action) {
       case 'analyze': navigate('/process-analysis', { state: { processId } });
@@ -157,10 +147,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onSidebarToggle={handleSidebarToggle} isSidebarOpen={isSidebarOpen} />
-      <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
+      <Header />
       
-      <main className="lg:ml-64 pt-16">
+      <main className="pt-16">
         <div className="p-6">
           {/* Page Header */}
           <div className="mb-8">

@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
-import Sidebar from '../../components/ui/Sidebar';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Icon from '../../components/AppIcon';
 import ProcessTable from './components/ProcessTable';
@@ -12,7 +11,6 @@ import { useToast } from '../../components/ui/Toast';
 const ProcessAnalysis = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedProcesses, setSelectedProcesses] = useState([]);
   const [filters, setFilters] = useState({
     department: '',
@@ -219,10 +217,6 @@ Manual inspection process requires 2 quality control specialists working full-ti
     return filtered;
   }, [filters, sortConfig]);
 
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
   };
@@ -283,12 +277,9 @@ Manual inspection process requires 2 quality control specialists working full-ti
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onSidebarToggle={handleSidebarToggle} isSidebarOpen={isSidebarOpen} />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Header />
       
-      <main className={`transition-all duration-300 ease-smooth ${
-        isSidebarOpen ? 'lg:ml-64' : 'lg:ml-64'
-      } pt-16`}>
+      <main className="pt-16">
         <div className="p-6">
           {/* Page Header */}
           <div className="mb-6">

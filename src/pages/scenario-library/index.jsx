@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
-import Sidebar from '../../components/ui/Sidebar';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
@@ -10,7 +9,6 @@ import { useToast, ToastContainer } from '../../components/ui/Toast';
 const ScenarioLibrary = () => {
   const navigate = useNavigate();
   const { toasts, removeToast, showSuccess, showError, showWarning } = useToast();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedScenarios, setSelectedScenarios] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterProvider, setFilterProvider] = useState('all');
@@ -297,31 +295,11 @@ const ScenarioLibrary = () => {
     navigate('/roi-calculator', { state: { templateId } });
   };
 
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const handleSidebarClose = () => {
-    setIsSidebarOpen(false);
-  };
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setIsSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
-      <Header onSidebarToggle={handleSidebarToggle} isSidebarOpen={isSidebarOpen} />
-      <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
+      <Header />
       
-      <main className="lg:ml-64 pt-16">
+      <main className="pt-16">
         <div className="p-6">
           {/* Page Header */}
           <div className="mb-8">

@@ -1,8 +1,45 @@
-.DS_Store
+# Dependencies
 node_modules
-.idea
-package-lock.json
+
+# Build outputs
 /build
+/dist
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDE files
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Config files with secrets
 vite.config.*s.*
+
+# Lock files (optional - remove this line if you want to commit lock files)
+package-lock.json

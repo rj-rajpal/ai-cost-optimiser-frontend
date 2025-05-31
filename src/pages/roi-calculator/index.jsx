@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
-import Sidebar from '../../components/ui/Sidebar';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Icon from '../../components/AppIcon';
 import ProviderCard from './components/ProviderCard';
@@ -10,7 +9,6 @@ import ScenarioComparison from './components/ScenarioComparison';
 
 const ROICalculator = () => {
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [assumptions, setAssumptions] = useState({
     taskFrequency: 1000,
     modelType: 'gpt-4',
@@ -272,17 +270,9 @@ const ROICalculator = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header 
-        onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-        isSidebarOpen={isSidebarOpen}
-      />
-      
-      <Sidebar 
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
+      <Header />
 
-      <main className="lg:ml-64 pt-16">
+      <main className="pt-16">
         <div className="p-6">
           {/* Header Section */}
           <div className="mb-8">

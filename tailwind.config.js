@@ -7,8 +7,63 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary Colors
-        'primary': '#2B84F6', // Trust-building blue - blue-600
+        // Cloud Mist Theme - Primary Colors
+        'soft-navy': '#3E4C59', // For headings, primary buttons, and icons
+        'sky-gray': '#CBD2D9', // For borders, input outlines, and inactive elements
+        
+        // Cloud Mist Theme - Accent Colors
+        'muted-indigo': '#667EEA', // For links, CTAs, or active highlights
+        'mist-teal': '#A7DADC', // For charts, light icons, or secondary elements
+        
+        // Cloud Mist Theme - Backgrounds
+        'cloud-white': '#F9FAFB', // Main background (ultra light and non-stark)
+        'fog-gray': '#E5E7EB', // Secondary panels or sidebars
+        
+        // Cloud Mist Theme - Text Colors
+        'charcoal-black': '#1F2933', // Main text (strong contrast, not full black)
+        'slate-gray': '#6B7280', // Subtext, descriptions, muted info
+        
+        // Cloud Mist Theme - Success/Error Highlights
+        'calm-green': '#A7F3D0', // Success
+        'soft-rose': '#FECACA', // Error
+
+        // shadcn/ui CSS variables
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        
+        // Original Primary Colors
+        'primary-original': '#2B84F6', // Trust-building blue - blue-600
         'primary-50': '#EBF5FF', // Very light blue - blue-50
         'primary-100': '#DBEAFE', // Light blue - blue-100
         'primary-500': '#3B82F6', // Medium blue - blue-500
@@ -17,7 +72,7 @@ module.exports = {
         'primary-900': '#1E3A8A', // Very dark blue - blue-900
 
         // Secondary Colors
-        'secondary': '#6B7280', // Neutral gray - gray-500
+        'secondary-original': '#6B7280', // Neutral gray - gray-500
         'secondary-100': '#F3F4F6', // Light gray - gray-100
         'secondary-200': '#E5E7EB', // Light gray - gray-200
         'secondary-300': '#D1D5DB', // Medium light gray - gray-300
@@ -28,13 +83,13 @@ module.exports = {
         'secondary-900': '#111827', // Darkest gray - gray-900
 
         // Accent Colors
-        'accent': '#22C55E', // Success green - green-500
+        'accent-original': '#22C55E', // Success green - green-500
         'accent-100': '#DCFCE7', // Light green - green-100
         'accent-500': '#22C55E', // Medium green - green-500
         'accent-600': '#16A34A', // Dark green - green-600
 
         // Background Colors
-        'background': '#0F1117', // Deep charcoal - slate-900
+        'background-original': '#0F1117', // Deep charcoal - slate-900
         'background-50': '#F8FAFC', // Very light slate - slate-50
         'background-100': '#F1F5F9', // Light slate - slate-100
         'background-800': '#1E293B', // Dark slate - slate-800
@@ -71,7 +126,7 @@ module.exports = {
         'error-600': '#DC2626', // Dark error - red-600
 
         // Border Colors
-        'border': 'rgba(255, 255, 255, 0.1)', // Subtle white border
+        'border-original': 'rgba(255, 255, 255, 0.1)', // Subtle white border
         'border-active': 'rgba(255, 255, 255, 0.2)', // Active border
         'border-focus': '#2B84F6', // Focus border - primary
       },
@@ -107,6 +162,7 @@ module.exports = {
         '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
         'elevation': '0 10px 25px rgba(0, 0, 0, 0.19), 0 6px 10px rgba(0, 0, 0, 0.23)',
         'floating': '0 4px 12px rgba(0, 0, 0, 0.15)',
+        'mist': '0 4px 16px rgba(62, 76, 89, 0.08), 0 2px 8px rgba(62, 76, 89, 0.04)',
       },
       borderRadius: {
         'sm': '0.25rem', // 4px
@@ -167,9 +223,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/aspect-ratio'),
-  ],
+  plugins: [],
 }

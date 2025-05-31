@@ -1,107 +1,148 @@
-# React
+# AI Cost Optimizer Frontend
 
-A modern React-based project utilizing the latest frontend technologies and tools for building responsive web applications.
+A modern React application for analyzing and optimizing AI service costs with integrated authentication and cost analytics.
 
-## 🚀 Features
+## ✨ Features
 
-- **React 18** - React version with improved rendering and concurrent features
-- **Vite** - Lightning-fast build tool and development server
-- **Redux Toolkit** - State management with simplified Redux setup
-- **TailwindCSS** - Utility-first CSS framework with extensive customization
-- **React Router v6** - Declarative routing for React applications
-- **Data Visualization** - Integrated D3.js and Recharts for powerful data visualization
-- **Form Management** - React Hook Form for efficient form handling
-- **Animation** - Framer Motion for smooth UI animations
-- **Testing** - Jest and React Testing Library setup
+- 🔐 **Authentication**: Supabase-powered auth with email/password and social login (Google, GitHub)
+- 📊 **Dashboard**: Real-time cost analytics and metrics visualization
+- 📈 **Charts**: Interactive spend vs token usage tracking
+- 🔍 **Process Analysis**: AI automation potential evaluation
+- 💰 **ROI Calculator**: Return on investment calculations
+- 📚 **Scenario Library**: Saved optimization models
+- 🎨 **Modern UI**: shadcn/ui components with Tailwind CSS
+- 📱 **Responsive**: Mobile-first design
 
-## 📋 Prerequisites
+## 🚀 Quick Start
 
-- Node.js (v14.x or higher)
+### Prerequisites
+
+- Node.js 16+
 - npm or yarn
+- Supabase account
 
-## 🛠️ Installation
+### Installation
 
-1. Install dependencies:
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ai-cost-optimiser-frontend
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
-   # or
-   yarn install
    ```
+
+3. **Set up environment variables**
+   ```bash
+   # Create .env.local file
+   cp .env.example .env.local
    
-2. Start the development server:
+   # Add your Supabase credentials
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key
+   ```
+
+4. **Start development server**
    ```bash
    npm start
-   # or
-   yarn start
    ```
 
-## 📁 Project Structure
+## 🔧 Configuration
+
+### Supabase Setup
+
+Follow the detailed setup guide in `SUPABASE_SETUP.md` to:
+- Create a Supabase project
+- Configure authentication providers
+- Set up OAuth (Google, GitHub)
+- Configure redirect URLs
+
+### Authentication
+
+The app includes:
+- Email/password authentication
+- Social login (Google, GitHub)
+- Protected routes
+- Session management
+- User profile management
+
+## 🏗️ Project Structure
 
 ```
-react_app/
-├── public/             # Static assets
-├── src/
-│   ├── components/     # Reusable UI components
-│   ├── pages/          # Page components
-│   ├── styles/         # Global styles and Tailwind configuration
-│   ├── App.jsx         # Main application component
-│   ├── Routes.jsx      # Application routes
-│   └── index.jsx       # Application entry point
-├── .env                # Environment variables
-├── index.html          # HTML template
-├── package.json        # Project dependencies and scripts
-├── tailwind.config.js  # Tailwind CSS configuration
-└── vite.config.js      # Vite configuration
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   └── ProtectedRoute.jsx
+├── contexts/           # React contexts
+│   └── AuthContext.jsx # Authentication state
+├── lib/               # Utilities and configurations
+│   ├── supabase.js    # Supabase client
+│   └── utils.js       # Helper functions
+├── pages/             # Page components
+│   ├── dashboard/     # Dashboard with analytics
+│   ├── login/         # Authentication
+│   └── ...
+└── styles/            # Global styles and CSS
 ```
 
-## 🧩 Adding Routes
+## 🎨 UI Components
 
-To add new routes to the application, update the `Routes.jsx` file:
+Built with modern, accessible components:
+- **Button**: Multi-variant button component with shadcn/ui
+- **Forms**: Styled form inputs with validation states
+- **Navigation**: Responsive header with user menu
+- **Modals & Dropdowns**: Animated overlays
+- **Charts**: Recharts integration for data visualization
 
-```jsx
-import { useRoutes } from "react-router-dom";
-import HomePage from "pages/HomePage";
-import AboutPage from "pages/AboutPage";
+## 🔐 Authentication Flow
 
-const ProjectRoutes = () => {
-  let element = useRoutes([
-    { path: "/", element: <HomePage /> },
-    { path: "/about", element: <AboutPage /> },
-    // Add more routes as needed
-  ]);
+1. User visits protected route
+2. Redirected to `/login` if not authenticated
+3. Choose email/password or social login
+4. Supabase handles authentication
+5. Redirected to dashboard on success
+6. Session persisted across browser sessions
 
-  return element;
-};
-```
+## 📦 Available Scripts
 
-## 🎨 Styling
+- `npm start` - Start development server
+- `npm run build` - Build for production
+- `npm run serve` - Preview production build
 
-This project uses Tailwind CSS for styling. The configuration includes:
+## 🛠️ Tech Stack
 
-- Forms plugin for form styling
-- Typography plugin for text styling
-- Aspect ratio plugin for responsive elements
-- Container queries for component-specific responsive design
-- Fluid typography for responsive text
-- Animation utilities
+- **Frontend**: React 18, Vite
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Authentication**: Supabase Auth
+- **State Management**: React Context
+- **Icons**: Lucide React
+- **Charts**: Recharts
+- **Forms**: React Hook Form
 
-## 📱 Responsive Design
+## 🌐 Deployment
 
-The app is built with responsive design using Tailwind CSS breakpoints.
+1. Build the project: `npm run build`
+2. Deploy the `build` folder to your hosting platform
+3. Update Supabase redirect URLs for production domain
+4. Set production environment variables
 
+## 📄 License
 
-## 📦 Deployment
+MIT License - see LICENSE file for details
 
-Build the application for production:
+## 🤝 Contributing
 
-```bash
-npm run build
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## 🙏 Acknowledgments
+## 📞 Support
 
-- Built with [Rocket.new](https://rocket.new)
-- Powered by React and Vite
-- Styled with Tailwind CSS
-
-Built with ❤️ on Rocket.new
+For questions or issues:
+- Check the `SUPABASE_SETUP.md` guide
+- Review the codebase documentation
+- Open an issue in the repository

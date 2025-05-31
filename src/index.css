@@ -1,0 +1,119 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  :root {
+    /* Cloud Mist Theme Variables */
+    --background: 249 250 251; /* Cloud White #F9FAFB */
+    --foreground: 31 41 51; /* Charcoal Black #1F2933 */
+    --card: 249 250 251; /* Cloud White #F9FAFB */
+    --card-foreground: 31 41 51; /* Charcoal Black #1F2933 */
+    --popover: 249 250 251; /* Cloud White #F9FAFB */
+    --popover-foreground: 31 41 51; /* Charcoal Black #1F2933 */
+    --primary: 62 76 89; /* Soft Navy #3E4C59 */
+    --primary-foreground: 249 250 251; /* Cloud White #F9FAFB */
+    --secondary: 229 231 235; /* Fog Gray #E5E7EB */
+    --secondary-foreground: 31 41 51; /* Charcoal Black #1F2933 */
+    --muted: 229 231 235; /* Fog Gray #E5E7EB */
+    --muted-foreground: 107 114 128; /* Slate Gray #6B7280 */
+    --accent: 102 126 234; /* Muted Indigo #667EEA */
+    --accent-foreground: 249 250 251; /* Cloud White #F9FAFB */
+    --destructive: 254 202 202; /* Soft Rose #FECACA */
+    --destructive-foreground: 31 41 51; /* Charcoal Black #1F2933 */
+    --border: 203 210 217; /* Sky Gray #CBD2D9 */
+    --input: 203 210 217; /* Sky Gray #CBD2D9 */
+    --ring: 102 126 234; /* Muted Indigo #667EEA */
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark mode can use similar values with adjusted contrast */
+    --background: 31 41 51; /* Soft Navy #3E4C59 */
+    --foreground: 249 250 251; /* Cloud White #F9FAFB */
+    --card: 62 76 89; /* Soft Navy #3E4C59 */
+    --card-foreground: 249 250 251; /* Cloud White #F9FAFB */
+    --popover: 62 76 89; /* Soft Navy #3E4C59 */
+    --popover-foreground: 249 250 251; /* Cloud White #F9FAFB */
+    --primary: 102 126 234; /* Muted Indigo #667EEA */
+    --primary-foreground: 249 250 251; /* Cloud White #F9FAFB */
+    --secondary: 107 114 128; /* Slate Gray #6B7280 */
+    --secondary-foreground: 249 250 251; /* Cloud White #F9FAFB */
+    --muted: 107 114 128; /* Slate Gray #6B7280 */
+    --muted-foreground: 203 210 217; /* Sky Gray #CBD2D9 */
+    --accent: 167 218 220; /* Mist Teal #A7DADC */
+    --accent-foreground: 31 41 51; /* Charcoal Black #1F2933 */
+    --destructive: 254 202 202; /* Soft Rose #FECACA */
+    --destructive-foreground: 31 41 51; /* Charcoal Black #1F2933 */
+    --border: 107 114 128; /* Slate Gray #6B7280 */
+    --input: 107 114 128; /* Slate Gray #6B7280 */
+    --ring: 167 218 220; /* Mist Teal #A7DADC */
+  }
+}
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Scrollbar styles with Cloud Mist theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.7);
+}
+
+/* Backdrop blur fallback */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+@supports not (backdrop-filter: blur(4px)) {
+  .backdrop-blur-sm {
+    background-color: rgba(62, 76, 89, 0.1);
+  }
+} 

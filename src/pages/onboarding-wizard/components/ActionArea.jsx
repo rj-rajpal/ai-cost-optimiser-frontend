@@ -5,6 +5,7 @@ const ActionArea = ({
   currentStep, 
   totalSteps, 
   canProceed, 
+  isCompleting = false,
   onNext, 
   onPrevious, 
   onSkip 
@@ -19,11 +20,12 @@ const ActionArea = ({
           {/* Previous Button */}
           <button
             onClick={onPrevious}
-            disabled={isFirstStep}
+            disabled={isFirstStep || isCompleting}
             className={`
               flex items-center space-x-2 px-4 py-2 rounded-md transition-all duration-200
-              ${isFirstStep
-                ? 'text-text-tertiary cursor-not-allowed' :'text-text-secondary hover:text-text-primary hover:bg-surface-700'
+              ${isFirstStep || isCompleting
+                ? 'text-text-tertiary cursor-not-allowed' 
+                : 'text-text-secondary hover:text-text-primary hover:bg-surface-700'
               }
             `}
           >
@@ -45,7 +47,8 @@ const ActionArea = ({
                     ${index === currentStep
                       ? 'bg-primary'
                       : index < currentStep
-                      ? 'bg-success' :'bg-surface-700'
+                      ? 'bg-success' 
+                      : 'bg-surface-700'
                     }
                   `}
                 />
@@ -59,7 +62,14 @@ const ActionArea = ({
             {!isLastStep && (
               <button
                 onClick={onSkip}
-                className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-200"
+                disabled={isCompleting}
+                className={`
+                  text-sm transition-colors duration-200
+                  ${isCompleting
+                    ? 'text-text-tertiary cursor-not-allowed'
+                    : 'text-text-secondary hover:text-text-primary'
+                  }
+                `}
               >
                 Skip Step
               </button>
@@ -68,16 +78,26 @@ const ActionArea = ({
             {/* Next/Complete Button */}
             <button
               onClick={onNext}
-              disabled={!canProceed}
+              disabled={!canProceed || isCompleting}
               className={`
                 flex items-center space-x-2 px-6 py-2 rounded-md font-medium transition-all duration-200
-                ${canProceed
-                  ? 'bg-primary text-white hover:bg-primary-700' :'bg-surface-700 text-text-tertiary cursor-not-allowed'
+                ${canProceed && !isCompleting
+                  ? 'bg-primary text-white hover:bg-primary-700' 
+                  : 'bg-surface-700 text-text-tertiary cursor-not-allowed'
                 }
               `}
             >
-              <span>{isLastStep ? 'Complete Setup' : 'Next'}</span>
-              <Icon name={isLastStep ? 'Check' : 'ArrowRight'} size={16} />
+              {isCompleting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Completing...</span>
+                </>
+              ) : (
+                <>
+                  <span>{isLastStep ? 'Complete Setup' : 'Next'}</span>
+                  <Icon name={isLastStep ? 'Check' : 'ArrowRight'} size={16} />
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -93,7 +113,8 @@ const ActionArea = ({
                   ${index === currentStep
                     ? 'bg-primary'
                     : index < currentStep
-                    ? 'bg-success' :'bg-surface-700'
+                    ? 'bg-success' 
+                    : 'bg-surface-700'
                   }
                 `}
               />
