@@ -4,16 +4,17 @@ import { Button } from "../../components/ui/button";
 import { Github, Mail, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
 
-const Login = () => {
+const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   
-  const { signInWithEmail, signInWithProvider, user } = useAuth();
+  const { signUpWithEmail, signInWithProvider, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already logged in
@@ -23,17 +24,30 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  const handleEmailLogin = async (e) => {
+  const handleEmailSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Basic validation
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
     
     try {
-      const { error } = await signInWithEmail(email, password);
+      const { error } = await signUpWithEmail(email, password, name);
       if (error) {
         setError(error.message);
       } else {
-        setMessage('Sign in successful! Redirecting...');
+        setMessage('Sign up successful! Redirecting...');
       }
     } catch (err) {
       setError('An unexpected error occurred');
@@ -42,7 +56,7 @@ const Login = () => {
     }
   };
 
-  const handleSocialLogin = async (provider) => {
+  const handleSocialSignup = async (provider) => {
     setLoading(true);
     setError('');
     
@@ -61,16 +75,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-cloud-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Back to Projects Link */}
-        <Link 
-          to="/projects" 
-          className="inline-flex items-center text-slate-gray hover:text-charcoal-black mb-8 transition-colors duration-200"
-        >
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Projects
-        </Link>
-
-        {/* Login Card */}
+        {/* Signup Card */}
         <div className="bg-white border border-sky-gray rounded-lg p-8 shadow-mist">
           {/* Header */}
           <div className="text-center mb-8">
@@ -83,9 +88,9 @@ const Login = () => {
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-charcoal-black">Welcome Back</h1>
+            <h1 className="text-2xl font-bold text-charcoal-black">Create Account</h1>
             <p className="text-slate-gray mt-2">
-              Sign in to your AI Cost Optimizer account
+              Sign up for your AI Cost Optimizer account
             </p>
           </div>
 
@@ -102,12 +107,12 @@ const Login = () => {
             </div>
           )}
 
-          {/* Social Login Buttons */}
+          {/* Social Signup Buttons */}
           <div className="flex gap-3 mb-6">
             <Button 
               variant="outline" 
               className="flex-1 bg-white border-sky-gray hover:bg-fog-gray text-charcoal-black"
-              onClick={() => handleSocialLogin('Google')}
+              onClick={() => handleSocialSignup('Google')}
               disabled={loading}
             >
               <Mail className="mr-2 text-[#EA4335]" size={16} aria-hidden="true" />
@@ -117,7 +122,7 @@ const Login = () => {
             <Button 
               variant="outline" 
               className="flex-1 bg-white border-sky-gray hover:bg-fog-gray text-charcoal-black"
-              onClick={() => handleSocialLogin('Github')}
+              onClick={() => handleSocialSignup('Github')}
               disabled={loading}
             >
               <Github className="mr-2 text-charcoal-black" size={16} aria-hidden="true" />
@@ -131,12 +136,12 @@ const Login = () => {
               <div className="w-full border-t border-sky-gray"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-slate-gray">Or continue with email</span>
+              <span className="bg-white px-4 text-slate-gray">Or sign up with email</span>
             </div>
           </div>
 
-          {/* Email Login Form */}
-          <form onSubmit={handleEmailLogin} className="space-y-4">
+          {/* Email Signup Form */}
+          <form onSubmit={handleEmailSignup} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-charcoal-black mb-2">
                 Full Name
@@ -148,6 +153,7 @@ const Login = () => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your full name"
                 className="w-full px-3 py-2 bg-cloud-white border border-sky-gray rounded-lg text-charcoal-black placeholder-slate-gray focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo transition-colors duration-200"
+                required
                 disabled={loading}
               />
             </div>
@@ -194,48 +200,42 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-charcoal-black mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
                 <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-muted-indigo focus:ring-muted-indigo border-sky-gray rounded"
+                  id="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  className="w-full px-3 py-2 bg-cloud-white border border-sky-gray rounded-lg text-charcoal-black placeholder-slate-gray focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo transition-colors duration-200 pr-10"
+                  required
                   disabled={loading}
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-gray">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <Link
-                  to="/forgot-password"
-                  className="text-muted-indigo hover:text-muted-indigo/80 transition-colors duration-200"
-                >
-                  Forgot password?
-                </Link>
               </div>
             </div>
 
             <Button 
               type="submit" 
               className="w-full bg-muted-indigo hover:bg-muted-indigo/90 text-white" 
-              disabled={loading || !email || !password}
+              disabled={loading || !email || !password || !confirmPassword || !name}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
 
-          {/* Sign Up Link */}
+          {/* Login Link */}
           <div className="text-center mt-6">
             <p className="text-slate-gray">
-              Don't have an account?{' '}
+              Already have an account?{' '}
               <Link 
-                to="/signup" 
+                to="/login" 
                 className="text-muted-indigo hover:text-muted-indigo/80 font-medium transition-colors duration-200"
               >
-                Sign up
+                Sign in
               </Link>
             </p>
           </div>
@@ -244,7 +244,7 @@ const Login = () => {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-slate-gray text-sm">
-            By signing in, you agree to our{' '}
+            By signing up, you agree to our{' '}
             <Link to="/terms" className="text-muted-indigo hover:text-muted-indigo/80 transition-colors duration-200">
               Terms of Service
             </Link>{' '}
@@ -259,4 +259,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Signup; 

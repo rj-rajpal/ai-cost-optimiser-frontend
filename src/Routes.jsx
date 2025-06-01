@@ -13,6 +13,7 @@ import ProcessAnalysis from "pages/process-analysis";
 import ROICalculator from "pages/roi-calculator";
 import ScenarioLibrary from "pages/scenario-library";
 import Login from "pages/login";
+import Signup from "pages/signup";
 
 const Routes = () => {
   return (
@@ -21,58 +22,23 @@ const Routes = () => {
         <ScrollToTop />
         <div className="min-h-screen bg-gray-50">
           <RouterRoutes>
-            {/* Public routes */}
+            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             
-            {/* Redirect root to login for unauthenticated users, projects for authenticated */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <ProjectsPage />
-              </ProtectedRoute>
-            } />
-            
-            {/* Protected routes */}
-            <Route path="/projects" element={
-              <ProtectedRoute>
-                <ProjectsPage />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/onboarding-wizard" element={
-              <ProtectedRoute>
-                <OnboardingWizard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/data-upload" element={
-              <ProtectedRoute>
-                <DataUpload />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/process-analysis" element={
-              <ProtectedRoute>
-                <ProcessAnalysis />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/roi-calculator" element={
-              <ProtectedRoute>
-                <ROICalculator />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/scenario-library" element={
-              <ProtectedRoute>
-                <ScenarioLibrary />
-              </ProtectedRoute>
-            } />
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/onboarding-wizard" element={<OnboardingWizard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/data-upload" element={<DataUpload />} />
+              <Route path="/process-analysis" element={<ProcessAnalysis />} />
+              <Route path="/roi-calculator" element={<ROICalculator />} />
+              <Route path="/scenario-library" element={<ScenarioLibrary />} />
+            </Route>
+
+            {/* Redirect root to login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
           </RouterRoutes>
         </div>
       </ErrorBoundary>

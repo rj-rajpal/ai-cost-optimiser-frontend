@@ -1,6 +1,8 @@
 import React from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Routes from "./Routes";
+import "./styles/tailwind.css";
+import "./styles/index.css";
 
 // Loading Component
 const LoadingScreen = () => (

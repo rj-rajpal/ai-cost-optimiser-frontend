@@ -1,8 +1,8 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -23,8 +23,13 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Redirect from /dashboard to /projects
+  if (location.pathname === '/dashboard') {
+    return <Navigate to="/projects" replace />;
+  }
+
   // Render children if authenticated
-  return children;
+  return <Outlet />;
 };
 
 export default ProtectedRoute; 
