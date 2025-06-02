@@ -96,7 +96,7 @@ export const getUIStyles = (isDarkMode) => ({
  * @returns {object} - Navigation style object with dynamic classes
  */
 export const getNavStyles = (isDarkMode) => ({
-  BREADCRUMB: "flex items-center space-x-2 text-sm mb-4",
+  BREADCRUMB: "flex items-center space-x-2 text-sm mb-4 z-20",
   TABS_CONTAINER: "flex space-x-8 overflow-x-auto z-20",
   TITLE_CONTAINER: "flex items-center space-x-4",
   TITLE_ICON: `w-12 h-12 bg-gradient-to-r from-mist-teal/20 to-muted-indigo/20 rounded-lg flex items-center justify-center border ${

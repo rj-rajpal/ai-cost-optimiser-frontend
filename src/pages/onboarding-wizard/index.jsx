@@ -6,7 +6,7 @@ import { useDarkMode } from '../../contexts/DarkModeContext';
 import { useDashboard } from '../../contexts/DashboardContext';
 import Icon from '../../components/AppIcon';
 import SideNavBar from '../../components/SideNavBar';
-import { chatService, projectService } from '../../services';
+import { chatService, projectService, openaiService } from '../../services';
 import { 
   MESSAGES,
   HEADER,
@@ -78,11 +78,201 @@ const formatStructuredResponse = (structuredData) => {
   return formattedResponse.trim();
 };
 
-// Helper function to extract project name from chat
-const extractProjectName = (chatHistory, structuredData) => {
+// Helper function to extract project name from chat using OpenAI
+const extractProjectName = async (chatHistory, structuredData) => {
+  try {
+    // Get context from structured data and chat history
+    const taskDescription = structuredData?.solution_architect?.opt_task || '';
+    const lastUserMessage = chatHistory
+      .filter(msg => msg.type === 'user')
+      .pop()?.text || '';
+    
+    // Create context for OpenAI
+    const context = `
+    Task: ${taskDescription}
+    User Query: ${lastUserMessage}
+    Workload: ${structuredData?.workload_params ? 
+      `${structuredData.workload_params.calls_per_day} calls/day, ${structuredData.workload_params.region} region` : 
+      'Not specified'}
+    `;
+
+    const systemPrompt = `You are an expert at creating concise, professional project names for AI cost optimization projects. 
+    Based on the provided context, generate a project name that is EXACTLY 3 words, descriptive, and professional.
+    
+    Rules:
+    - Must be exactly 3 words
+    - Use title case (e.g., "Email Processing Optimizer")
+    - Be descriptive of the AI optimization task
+    - Avoid generic words like "Project", "System", "Application"
+    - Focus on the business function and optimization aspect
+    
+    Return ONLY the 3-word project name, nothing else.`;
+
+    const userMessage = `Generate a 3-word project name for this AI cost optimization context: ${context}`;
+
+    const projectName = await openaiService.sendWithSystemPrompt(
+      systemPrompt,
+      userMessage,
+      { 
+        model: 'gpt-4o-mini',
+        temperature: 0.3,
+        max_tokens: 10
+      }
+    );
+
+    // Clean and validate the response
+    const cleanedName = projectName.trim().replace(/['"]/g, '');
+    const words = cleanedName.split(' ').filter(word => word.length > 0);
+    
+    // If we got exactly 3 words, use it; otherwise use fallback
+    if (words.length === 3) {
+      return words.join(' ');
+    }
+    
+    // Fallback logic if OpenAI doesn't return exactly 3 words
+    console.warn('OpenAI did not return exactly 3 words, using fallback');
+    return generateFallbackProjectName(chatHistory, structuredData);
+    
+  } catch (error) {
+    console.error('Error generating project name with OpenAI:', error);
+    return generateFallbackProjectName(chatHistory, structuredData);
+  }
+};
+
+// Helper function to generate project description using OpenAI
+const generateProjectDescription = async (projectName, chatHistory, structuredData) => {
+  try {
+    // Get context from structured data and chat history
+    const taskDescription = structuredData?.solution_architect?.opt_task || '';
+    const lastUserMessage = chatHistory
+      .filter(msg => msg.type === 'user')
+      .pop()?.text || '';
+    
+    const workloadInfo = structuredData?.workload_params ? 
+      `${structuredData.workload_params.calls_per_day} API calls per day in ${structuredData.workload_params.region}` : 
+      'Workload parameters not specified';
+    
+    const roiInfo = structuredData?.roi_analysis?.savings_per_month ? 
+      `Potential monthly savings: $${structuredData.roi_analysis.savings_per_month}` :
+      'ROI analysis available';
+
+    const systemPrompt = `You are an expert at creating concise, professional project descriptions for AI cost optimization projects.
+    Based on the provided context, generate a short description that is 1-2 sentences long, professional, and clearly explains what this optimization project accomplishes.
+    
+    Rules:
+    - Keep it to 1-2 sentences maximum
+    - Be specific about the business function being optimized
+    - Mention the optimization benefit (cost reduction, efficiency, etc.)
+    - Use professional business language
+    - Don't include technical jargon
+    
+    Return ONLY the description, nothing else.`;
+
+    const userMessage = `Generate a short description for the project "${projectName}" based on this context:
+    
+    Project Name: ${projectName}
+    Task: ${taskDescription}
+    User Query: ${lastUserMessage}
+    Workload: ${workloadInfo}
+    Expected Benefit: ${roiInfo}`;
+
+    const description = await openaiService.sendWithSystemPrompt(
+      systemPrompt,
+      userMessage,
+      { 
+        model: 'gpt-3.5-turbo',
+        temperature: 0.4,
+        max_tokens: 100
+      }
+    );
+
+    return description.trim();
+    
+  } catch (error) {
+    console.error('Error generating project description with OpenAI:', error);
+    return generateFallbackDescription(projectName, structuredData);
+  }
+};
+
+// Helper function to generate project summary using OpenAI
+const generateProjectSummary = async (projectName, projectDescription, chatHistory, structuredData) => {
+  try {
+    // Get comprehensive context from structured data and chat history
+    const taskDescription = structuredData?.solution_architect?.opt_task || '';
+    const lastUserMessage = chatHistory
+      .filter(msg => msg.type === 'user')
+      .pop()?.text || '';
+    
+    const workloadInfo = structuredData?.workload_params ? 
+      `${structuredData.workload_params.calls_per_day} API calls per day, ${structuredData.workload_params.avg_input_tokens} avg input tokens, ${structuredData.workload_params.avg_output_tokens} avg output tokens, ${structuredData.workload_params.latency_sla_ms}ms latency SLA in ${structuredData.workload_params.region}` : 
+      'Workload parameters not specified';
+    
+    const costAnalysis = structuredData?.cost_table?.slice(0, 3).map(model => 
+      `${model.model_name}: $${model.monthly_cost}/month (${model.p90_latency_ms}ms latency)`
+    ).join(', ') || 'Cost analysis not available';
+    
+    const roiInfo = structuredData?.roi_analysis ? 
+      `Current model: ${structuredData.roi_analysis.current_model || 'Not specified'}, Recommended: ${structuredData.roi_analysis.best_model || 'TBD'}, Monthly savings: $${structuredData.roi_analysis.savings_per_month || 0}, ROI: ${structuredData.roi_analysis.roi_percent || 0}%` :
+      'ROI analysis not available';
+
+    const finalRecommendation = structuredData?.final_recommendation || 'No specific recommendation provided';
+
+    const systemPrompt = `You are an expert at creating comprehensive project summaries for AI cost optimization initiatives.
+    Based on the provided context, generate a detailed summary that is 3-4 sentences long, professional, and covers the key aspects of the optimization project.
+    
+    Rules:
+    - Keep it to 3-4 sentences maximum
+    - Include the business context and current challenge
+    - Mention the recommended solution and expected benefits
+    - Include specific metrics when available (costs, savings, performance)
+    - Use professional business language
+    - Be specific and actionable
+    
+    Return ONLY the summary, nothing else.`;
+
+    const userMessage = `Generate a comprehensive summary for the AI cost optimization project with the following details:
+    
+    Project Name: ${projectName}
+    Project Description: ${projectDescription}
+    
+    Context:
+    - Task: ${taskDescription}
+    - User Challenge: ${lastUserMessage}
+    - Workload Details: ${workloadInfo}
+    - Cost Analysis: ${costAnalysis}
+    - ROI Analysis: ${roiInfo}
+    - Final Recommendation: ${finalRecommendation}`;
+
+    const summary = await openaiService.sendWithSystemPrompt(
+      systemPrompt,
+      userMessage,
+      { 
+        model: 'gpt-4o-mini',
+        temperature: 0.3,
+        max_tokens: 200
+      }
+    );
+
+    return summary.trim();
+    
+  } catch (error) {
+    console.error('Error generating project summary with OpenAI:', error);
+    return generateFallbackSummary(projectName, projectDescription, structuredData);
+  }
+};
+
+// Fallback function for project name generation
+const generateFallbackProjectName = (chatHistory, structuredData) => {
   // Try to get task name from solution architect
   if (structuredData?.solution_architect?.opt_task) {
-    return structuredData.solution_architect.opt_task;
+    const words = structuredData.solution_architect.opt_task
+      .split(' ')
+      .slice(0, 3)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+    
+    if (words.length >= 3) {
+      return words.slice(0, 3).join(' ');
+    }
   }
   
   // Fallback to extracting from the last user message
@@ -91,12 +281,46 @@ const extractProjectName = (chatHistory, structuredData) => {
     .pop();
   
   if (lastUserMessage) {
-    // Simple extraction logic - take first few words
-    const words = lastUserMessage.text.split(' ').slice(0, 4);
-    return words.join(' ').replace(/[^a-zA-Z0-9\s]/g, '').trim() || 'AI Cost Optimization';
+    // Simple extraction logic - take first three meaningful words
+    const words = lastUserMessage.text
+      .split(' ')
+      .filter(word => word.length > 2) // Filter out small words
+      .slice(0, 3)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase().replace(/[^a-zA-Z0-9]/g, ''));
+    
+    if (words.length >= 3) {
+      return words.slice(0, 3).join(' ');
+    }
   }
   
-  return 'AI Cost Optimization Project';
+  return 'AI Cost Optimizer';
+};
+
+// Fallback function for project description
+const generateFallbackDescription = (projectName, structuredData) => {
+  const taskDescription = structuredData?.solution_architect?.opt_task || 'AI cost optimization';
+  const savings = structuredData?.roi_analysis?.savings_per_month;
+  
+  if (savings && savings > 0) {
+    return `${taskDescription} project focused on reducing AI infrastructure costs with potential monthly savings of $${savings}.`;
+  }
+  
+  return `${taskDescription} project designed to optimize AI infrastructure costs and improve operational efficiency.`;
+};
+
+// Fallback function for project summary
+const generateFallbackSummary = (projectName, projectDescription, structuredData) => {
+  const taskDescription = structuredData?.solution_architect?.opt_task || 'AI cost optimization';
+  const currentModel = structuredData?.roi_analysis?.current_model || 'existing AI models';
+  const recommendedModel = structuredData?.roi_analysis?.best_model || 'optimized AI models';
+  const savings = structuredData?.roi_analysis?.savings_per_month || 0;
+  const workload = structuredData?.workload_params?.calls_per_day || 'various';
+
+  if (savings > 0) {
+    return `${projectName} addresses ${taskDescription} challenges by migrating from ${currentModel} to ${recommendedModel}. The project handles ${workload} daily API calls and is projected to achieve $${savings} in monthly cost savings. This optimization initiative will improve operational efficiency while maintaining service quality and performance standards.`;
+  }
+  
+  return `${projectName} focuses on ${taskDescription} by implementing optimized AI models and infrastructure. The project aims to improve cost efficiency for ${workload} daily operations while maintaining performance standards. This initiative will establish a foundation for scalable and cost-effective AI operations.`;
 };
 
 const OnboardingWizard = () => {
@@ -288,13 +512,21 @@ const OnboardingWizard = () => {
     
     try {
       // Extract project name from chat history and structured data
-      const projectName = extractProjectName(chatHistory, structuredData);
+      const projectName = await extractProjectName(chatHistory, structuredData);
+      
+      // Generate project description
+      const projectDescription = await generateProjectDescription(projectName, chatHistory, structuredData);
+      
+      // Generate project summary
+      const projectSummary = await generateProjectSummary(projectName, projectDescription, chatHistory, structuredData);
       
       // Process structured data into project format
       const projectData = projectService.processStructuredDataToProject(
         structuredData, 
         projectName, 
-        chatHistory
+        chatHistory,
+        projectDescription,
+        projectSummary
       );
       
       // Save the project
@@ -304,12 +536,12 @@ const OnboardingWizard = () => {
         // Process structured data for dashboard context with project ID
         processStructuredData(structuredData, projectData.id);
         
-        // Show success message
+        // Show success message with project name and description
         setMessages(prevMessages => [
           ...prevMessages,
           { 
             type: 'bot', 
-            text: `🎉 **Dashboard Generated Successfully!**\n\nYour AI cost optimization analysis is ready! Project "${projectData.title}" has been created. Redirecting you to the dashboard in 2 seconds...`,
+            text: `🎉 **Dashboard Generated Successfully!**\n\n**Project:** ${projectData.title}\n**Description:** ${projectData.description}\n**Summary:** ${projectData.summary}\n\nYour AI cost optimization analysis is ready! Redirecting you to the dashboard in 2 seconds...`,
             isSystemMessage: true
           }
         ]);
@@ -338,7 +570,7 @@ const OnboardingWizard = () => {
   }, [isCreatingProject, navigate, processStructuredData]);
 
   // Development test function
-  const handleTestStructuredData = useCallback(() => {
+  const handleTestStructuredData = useCallback(async () => {
     const structuredData = mockStructuredData.structured_data;
     
     // Create test chat history
@@ -346,62 +578,74 @@ const OnboardingWizard = () => {
       { type: 'user', text: '[TEST] Generate dashboard with sample data' }
     ];
     
-    // Extract project name
-    const projectName = extractProjectName(testChatHistory, structuredData);
-    
-    // Process structured data into project format
-    const projectData = projectService.processStructuredDataToProject(
-      structuredData, 
-      projectName, 
-      testChatHistory
-    );
-    
-    // Save the project
-    const saveSuccess = projectService.saveProject(projectData);
-    
-    if (saveSuccess) {
-      // Process structured data using dashboard context with project ID
-      processStructuredData(structuredData, projectData.id);
+    try {
+      // Extract project name
+      const projectName = await extractProjectName(testChatHistory, structuredData);
       
-      // Show the dashboard generation message
-      const botReply = "Please wait while we generate the Dashboard for you";
+      // Generate project description
+      const projectDescription = await generateProjectDescription(projectName, testChatHistory, structuredData);
       
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { 
-          type: 'user', 
-          text: '[TEST] Generate dashboard with sample data'
-        },
-        { 
-          type: 'bot', 
-          text: botReply,
-          structuredData: structuredData,
-          isDashboardGenerating: true
-        }
-      ]);
+      // Generate project summary
+      const projectSummary = await generateProjectSummary(projectName, projectDescription, testChatHistory, structuredData);
       
-      // Navigate to project dashboard after delay
-      setTimeout(() => {
+      // Process structured data into project format
+      const projectData = projectService.processStructuredDataToProject(
+        structuredData, 
+        projectName, 
+        testChatHistory,
+        projectDescription,
+        projectSummary
+      );
+      
+      // Save the project
+      const saveSuccess = projectService.saveProject(projectData);
+      
+      if (saveSuccess) {
+        // Process structured data using dashboard context with project ID
+        processStructuredData(structuredData, projectData.id);
+        
+        // Show the dashboard generation message
+        const botReply = "Please wait while we generate the Dashboard for you";
+        
         setMessages(prevMessages => [
           ...prevMessages,
           { 
+            type: 'user', 
+            text: '[TEST] Generate dashboard with sample data'
+          },
+          { 
             type: 'bot', 
-            text: `🎉 **Dashboard Generated Successfully!**\n\nYour AI cost optimization analysis is ready! Project "${projectData.title}" has been created. Redirecting you to the dashboard in 2 seconds...`,
-            isSystemMessage: true
+            text: botReply,
+            structuredData: structuredData,
+            isDashboardGenerating: true
           }
         ]);
         
+        // Navigate to project dashboard after delay
         setTimeout(() => {
-          navigate(`/project/${projectData.id}/dashboard`);
+          setMessages(prevMessages => [
+            ...prevMessages,
+            { 
+              type: 'bot', 
+              text: `🎉 **Dashboard Generated Successfully!**\n\n**Project:** ${projectData.title}\n**Description:** ${projectData.description}\n**Summary:** ${projectData.summary}\n\nYour AI cost optimization analysis is ready! Redirecting you to the dashboard in 2 seconds...`,
+              isSystemMessage: true
+            }
+          ]);
+          
+          setTimeout(() => {
+            navigate(`/project/${projectData.id}/dashboard`);
+          }, 2000);
         }, 2000);
-      }, 2000);
-    } else {
-      console.error('Failed to save test project');
+      } else {
+        console.error('Failed to save test project');
+      }
+    } catch (error) {
+      console.error('Error in test function:', error);
     }
   }, [processStructuredData, navigate]);
 
   // Test function for successful structured data response
-  const handleTestSuccessFlow = useCallback(() => {
+  const handleTestSuccessFlow = useCallback(async () => {
     const testMessage = "We process 500 support emails daily, need AI to tag priority and draft replies";
     
     setMessages(prevMessages => [
@@ -412,41 +656,50 @@ const OnboardingWizard = () => {
     setIsLoading(true);
     
     // Simulate API response with structured data after 1 second
-    setTimeout(() => {
+    setTimeout(async () => {
       const structuredData = mockStructuredData.structured_data;
       
-      // Create a temporary project to get ID for testing
-      const testChatHistory = [{ type: 'user', text: testMessage }];
-      const projectName = extractProjectName(testChatHistory, structuredData);
-      const projectData = projectService.processStructuredDataToProject(
-        structuredData, 
-        projectName, 
-        testChatHistory
-      );
-      
-      // Process structured data using dashboard context with project ID
-      processStructuredData(structuredData, projectData.id);
-      
-      // Show the dashboard generation message
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { 
-          type: 'bot', 
-          text: "Please wait while we generate the Dashboard for you",
-          structuredData: structuredData,
-          isDashboardGenerating: true
-        }
-      ]);
-      
-      setIsLoading(false);
-      
-      // Process and save as project after delay
-      setTimeout(() => {
-        handleCreateProject(structuredData, [
-          ...messages,
-          { type: 'user', text: testMessage }
+      try {
+        // Create a temporary project to get ID for testing
+        const testChatHistory = [{ type: 'user', text: testMessage }];
+        const projectName = await extractProjectName(testChatHistory, structuredData);
+        const projectDescription = await generateProjectDescription(projectName, testChatHistory, structuredData);
+        const projectSummary = await generateProjectSummary(projectName, projectDescription, testChatHistory, structuredData);
+        const projectData = projectService.processStructuredDataToProject(
+          structuredData, 
+          projectName, 
+          testChatHistory,
+          projectDescription,
+          projectSummary
+        );
+        
+        // Process structured data using dashboard context with project ID
+        processStructuredData(structuredData, projectData.id);
+        
+        // Show the dashboard generation message
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { 
+            type: 'bot', 
+            text: "Please wait while we generate the Dashboard for you",
+            structuredData: structuredData,
+            isDashboardGenerating: true
+          }
         ]);
-      }, 2000);
+        
+        setIsLoading(false);
+        
+        // Process and save as project after delay
+        setTimeout(() => {
+          handleCreateProject(structuredData, [
+            ...messages,
+            { type: 'user', text: testMessage }
+          ]);
+        }, 2000);
+      } catch (error) {
+        console.error('Error in test success flow:', error);
+        setIsLoading(false);
+      }
     }, 1000);
   }, [processStructuredData, messages]);
 

@@ -11,7 +11,7 @@ export const API_CONFIG = {
 
 // OpenAI Configuration
 export const OPENAI_CONFIG = {
-  API_KEY: import.meta.env.VITE_OPENAI_API_KEY,
+  API_KEY: import.meta.env.OPENAI_API_KEY,
   BASE_URL: 'https://api.openai.com/v1',
   DEFAULT_MODEL: 'gpt-3.5-turbo',
   MODELS: {

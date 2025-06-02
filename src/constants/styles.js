@@ -83,15 +83,15 @@ export const CARDS = {
 // Chat Interface Styles
 export const CHAT = {
   CONTAINER: "flex-1 flex flex-col items-center justify-end w-full max-w-2xl mx-auto pb-32",
-  MESSAGES: "w-full px-4",
-  USER_MESSAGE: "flex justify-end mb-2",
-  BOT_MESSAGE: "flex justify-start mb-2",
-  USER_BUBBLE: "rounded-2xl px-4 py-2 shadow-sm bg-muted-indigo text-white",
-  BOT_BUBBLE: "bg-white text-charcoal-black border border-sky-gray rounded-2xl px-4 py-2 shadow-sm",
-  LOADING_MESSAGE: "bg-white border border-sky-gray px-4 py-2 rounded-2xl shadow-sm flex items-center gap-2",
-  LOADING_DOTS: "flex space-x-1",
-  LOADING_DOT: "w-2 h-2 bg-slate-gray rounded-full animate-bounce",
-  LOADING_TEXT: "text-slate-gray text-xs",
+  MESSAGES: "w-full px-4 z-20",
+  USER_MESSAGE: "flex justify-end mb-2 z-20",
+  BOT_MESSAGE: "flex justify-start mb-2 z-20",
+  USER_BUBBLE: "rounded-2xl px-4 py-2 shadow-sm bg-muted-indigo text-white z-20",
+  BOT_BUBBLE: "bg-white text-charcoal-black border border-sky-gray rounded-2xl px-4 py-2 shadow-sm z-20",
+  LOADING_MESSAGE: "bg-white border border-sky-gray px-4 py-2 rounded-2xl shadow-sm flex items-center gap-2 z-20",
+  LOADING_DOTS: "flex space-x-1 z-20",
+  LOADING_DOT: "w-2 h-2 bg-slate-gray rounded-full animate-bounce z-20",
+  LOADING_TEXT: "text-slate-gray text-xs z-20",
 };
 
 // Sidebar Styles

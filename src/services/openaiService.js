@@ -11,7 +11,7 @@ class OpenAIService {
     this.apiKey = OPENAI_CONFIG.API_KEY;
     
     if (!this.apiKey) {
-      console.warn('OpenAI API key not found. Please set VITE_OPENAI_API_KEY in your environment variables.');
+      console.warn('OpenAI API key not found. Please set OPENAI_API_KEY in your environment variables.');
     }
 
     this.defaultModel = OPENAI_CONFIG.DEFAULT_MODEL;

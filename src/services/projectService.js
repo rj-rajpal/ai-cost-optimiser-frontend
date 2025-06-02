@@ -12,9 +12,11 @@ class ProjectService {
    * @param {Object} structuredData - Raw structured data from API
    * @param {string} projectName - Name/title for the project
    * @param {Array} chatHistory - Chat messages that led to this project
+   * @param {string} description - Short description of the project (optional)
+   * @param {string} summary - Detailed summary of the project (optional)
    * @returns {Object} Processed project data
    */
-  processStructuredDataToProject(structuredData, projectName, chatHistory = []) {
+  processStructuredDataToProject(structuredData, projectName, chatHistory = [], description = '', summary = '') {
     const projectId = this.generateProjectId(projectName);
     
     // Use transform utility to process the structured data
@@ -37,6 +39,8 @@ class ProjectService {
     const projectData = {
       id: projectId,
       title: projectName,
+      description: description || this.generateDefaultDescription(structuredData),
+      summary: summary || this.generateDefaultSummary(projectName, description || this.generateDefaultDescription(structuredData), structuredData),
       phase: 'CMP', // Complete - since we have analysis data
       progress: 100,
       created_at: new Date().toISOString(),
@@ -351,6 +355,44 @@ class ProjectService {
       console.error('Error updating project:', error);
       return false;
     }
+  }
+
+  /**
+   * Generate a default description if none provided
+   * @param {Object} structuredData - Structured data from API
+   * @returns {string} Default description
+   */
+  generateDefaultDescription(structuredData) {
+    const taskDescription = structuredData?.solution_architect?.opt_task || 'AI cost optimization';
+    const savings = structuredData?.roi_analysis?.savings_per_month;
+    
+    if (savings && savings > 0) {
+      return `${taskDescription} project focused on reducing AI infrastructure costs with potential monthly savings of $${savings}.`;
+    }
+    
+    return `${taskDescription} project designed to optimize AI infrastructure costs and improve operational efficiency.`;
+  }
+
+  /**
+   * Generate a default summary if none provided
+   * @param {string} projectName - Project name
+   * @param {string} description - Project description
+   * @param {Object} structuredData - Structured data from API
+   * @returns {string} Default summary
+   */
+  generateDefaultSummary(projectName, description, structuredData) {
+    const taskDescription = structuredData?.solution_architect?.opt_task || 'AI cost optimization';
+    const currentModel = structuredData?.roi_analysis?.current_model || 'existing AI models';
+    const recommendedModel = structuredData?.roi_analysis?.best_model || 'optimized AI models';
+    const savings = structuredData?.roi_analysis?.savings_per_month || 0;
+    const workload = structuredData?.workload_params?.calls_per_day || 'various';
+    const region = structuredData?.workload_params?.region || 'global';
+    
+    if (savings > 0) {
+      return `${projectName} addresses ${taskDescription} challenges by transitioning from ${currentModel} to ${recommendedModel} across ${region} operations. The project handles ${workload} daily API calls and is projected to achieve $${savings} in monthly cost savings through optimized model selection and infrastructure improvements. This comprehensive optimization initiative will enhance operational efficiency while maintaining service quality and performance standards.`;
+    }
+    
+    return `${projectName} focuses on ${taskDescription} by implementing optimized AI models and infrastructure improvements across ${region} operations. The project aims to improve cost efficiency for ${workload} daily operations while maintaining high performance standards. This strategic initiative establishes a foundation for scalable and cost-effective AI operations with enhanced monitoring and optimization capabilities.`;
   }
 }
 

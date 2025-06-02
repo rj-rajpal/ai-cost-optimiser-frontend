@@ -19,7 +19,7 @@ Create a `.env` file in your project root and add your OpenAI API key:
 
 ```env
 # OpenAI Configuration
-VITE_OPENAI_API_KEY=sk-proj-your-actual-api-key-here
+OPENAI_API_KEY=sk-proj-your-actual-api-key-here
 
 # Other existing variables...
 VITE_API_BASE_URL=http://localhost:3001/api
@@ -385,7 +385,7 @@ const generalResponse = await openaiService.sendMessage(
 ### Common Issues
 
 1. **"OpenAI API key is not configured"**
-   - Check that `VITE_OPENAI_API_KEY` is set in your `.env` file
+   - Check that `OPENAI_API_KEY` is set in your `.env` file
    - Restart your development server after adding the variable
 
 2. **"Network error: Unable to connect to OpenAI API"**
@@ -408,7 +408,7 @@ Create a `.env` file in your project root:
 
 ```env
 # Required: OpenAI API Key
-VITE_OPENAI_API_KEY=sk-proj-your-actual-api-key-here
+OPENAI_API_KEY=sk-proj-your-actual-api-key-here
 
 # Existing configuration
 VITE_API_BASE_URL=http://localhost:3001/api
