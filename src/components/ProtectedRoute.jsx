@@ -1,27 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { cleanOAuthUrl, hasOAuthParams } from '../utils/authHelpers';
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
-
-  // Handle OAuth callback cleanup
-  useEffect(() => {
-    if (user && hasOAuthParams()) {
-      console.log('ProtectedRoute: Cleaning OAuth parameters');
-      cleanOAuthUrl();
-    }
-  }, [user]);
-
-  // Additional cleanup on location change
-  useEffect(() => {
-    if (hasOAuthParams()) {
-      console.log('ProtectedRoute: Location changed, cleaning OAuth parameters');
-      cleanOAuthUrl();
-    }
-  }, [location.pathname]);
 
   // Show loading spinner while checking auth
   if (loading) {

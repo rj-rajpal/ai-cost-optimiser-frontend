@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { cleanOAuthUrl, hasOAuthParams, navigateToProjectsClean } from '../utils/authHelpers';
 
 const AuthContext = createContext({});
 
@@ -17,46 +16,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Handle OAuth callback immediately on mount
-    const handleOAuthCallback = async () => {
-      // Check if we have OAuth callback parameters in the URL
-      if (hasOAuthParams()) {
-        try {
-          console.log('Detected OAuth callback, processing...');
-          
-          // Process the OAuth callback
-          const { data, error } = await supabase.auth.getSession();
-          
-          if (error) {
-            console.error('OAuth callback error:', error);
-            cleanOAuthUrl(); // Clean URL even on error
-            return;
-          }
-
-          if (data.session) {
-            console.log('OAuth success, user authenticated:', data.session.user.email);
-            setUser(data.session.user);
-            
-            // Clean up the URL immediately
-            cleanOAuthUrl();
-            
-            // Navigate to projects if not already there
-            if (window.location.pathname !== '/projects') {
-              setTimeout(() => {
-                navigateToProjectsClean();
-              }, 100);
-            }
-          } else {
-            console.log('No session found, cleaning URL');
-            cleanOAuthUrl();
-          }
-        } catch (error) {
-          console.error('Error processing OAuth callback:', error);
-          cleanOAuthUrl(); // Clean URL on error
-        }
-      }
-    };
-
     // Get initial session
     const getInitialSession = async () => {
       try {
@@ -75,25 +34,14 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    // Handle OAuth callback first, then get session
-    handleOAuthCallback().then(() => {
-      getInitialSession();
-    });
+    getInitialSession();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.email);
-        
         setUser(session?.user ?? null);
         setLoading(false);
-
-        // Additional cleanup for any remaining OAuth parameters
-        if (event === 'SIGNED_IN' && session) {
-          if (hasOAuthParams()) {
-            cleanOAuthUrl();
-          }
-        }
       }
     );
 
@@ -160,7 +108,7 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/projects`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
