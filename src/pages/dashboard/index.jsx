@@ -8,6 +8,7 @@ import WorkloadParams from '../../components/WorkloadParams';
 import ModelRanking from '../../components/ModelRanking';
 import { KPI } from './components/KPI';
 import SpendVsTokensChart from './components/SpendVsTokensChart';
+import { SplashCursor } from '../../components/ui/splash-cursor';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -76,139 +77,148 @@ const Dashboard = () => {
   }
 
   return (
-    <div className={`p-6 min-h-screen space-y-6 transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>
-      {/* Data Source Indicator - Full Width */}
-      {dashboardData && (
-        <div className={`w-full p-4 border rounded-lg transition-colors duration-300 ${
-          isDarkMode 
-            ? 'bg-black border-gray-800 text-white' 
-            : 'bg-muted-indigo/10 border-muted-indigo/20'
-        }`}>
-          <div className="flex items-center space-x-2">
-            <Icon name="CheckCircle" size={16} className="text-muted-indigo" />
-            <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
-              Model rankings generated from your AI optimization analysis
-            </span>
-            <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
-              Last updated: {new Date(dashboardData.lastUpdated).toLocaleString()}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Header Section - Full Width */}
-      <div className={`w-full rounded-xl border p-6 transition-colors duration-300 ${
-        isDarkMode 
-          ? 'bg-black border-gray-800 shadow-2xl' 
-          : 'bg-white shadow-mist border-sky-gray'
-      }`}>
-        <div className="flex items-center space-x-3">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-            isDarkMode ? 'bg-muted-indigo/20' : 'bg-muted-indigo/10'
-          }`}>
-            <Icon name="Trophy" size={20} className="text-muted-indigo" />
-          </div>
-          <div>
-            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>AI Model Performance Wars</h2>
-            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>
-              AI models ranked by performance, cost, and efficiency metrics
-            </p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-black relative">
+      {/* Splash Cursor Background */}
+      <div className="fixed inset-0 z-0">
+        <SplashCursor />
       </div>
+      
+      <div className="relative z-10">
+        <div className={`p-6 min-h-screen space-y-6 transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>
+          {/* Data Source Indicator - Full Width */}
+          {dashboardData && (
+            <div className={`w-full p-4 border rounded-lg transition-colors duration-300 ${
+              isDarkMode 
+                ? 'bg-black border-gray-800 text-white' 
+                : 'bg-muted-indigo/10 border-muted-indigo/20'
+            }`}>
+              <div className="flex items-center space-x-2">
+                <Icon name="CheckCircle" size={16} className="text-muted-indigo" />
+                <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+                  Model rankings generated from your AI optimization analysis
+                </span>
+                <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
+                  Last updated: {new Date(dashboardData.lastUpdated).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          )}
 
-      {/* Summary Stats - Full Width */}
-      <div className={`w-full rounded-xl border p-6 transition-colors duration-300 ${
-        isDarkMode 
-          ? 'bg-black border-gray-800 shadow-2xl' 
-          : 'bg-white shadow-mist border-sky-gray'
-      }`}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+          {/* Header Section - Full Width */}
+          <div className={`w-full rounded-xl border p-6 transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-black border-gray-800 shadow-2xl' 
+              : 'bg-white shadow-mist border-sky-gray'
+          }`}>
+            <div className="flex items-center space-x-3">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                isDarkMode ? 'bg-muted-indigo/20' : 'bg-muted-indigo/10'
+              }`}>
+                <Icon name="Trophy" size={20} className="text-muted-indigo" />
+              </div>
+              <div>
+                <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>AI Model Performance Wars</h2>
+                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>
+                  AI models ranked by performance, cost, and efficiency metrics
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Summary Stats - Full Width */}
+          <div className={`w-full rounded-xl border p-6 transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-black border-gray-800 shadow-2xl' 
+              : 'bg-white shadow-mist border-sky-gray'
+          }`}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                isDarkMode 
+                  ? 'bg-gray-950 border-gray-800' 
+                  : 'bg-cloud-white border-sky-gray'
+              }`}>
+                <div className="flex items-center space-x-2">
+                  <Icon name="Zap" size={16} className="text-muted-indigo" />
+                  <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Models Analyzed</span>
+                </div>
+                <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>{rankedModels.length}</p>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Performance ranked</p>
+              </div>
+              
+              <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                isDarkMode 
+                  ? 'bg-gray-950 border-gray-800' 
+                  : 'bg-cloud-white border-sky-gray'
+              }`}>
+                <div className="flex items-center space-x-2">
+                  <Icon name="DollarSign" size={16} className="text-calm-green" />
+                  <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Best Cost</span>
+                </div>
+                <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+                  ${Math.min(...rankedModels.map(m => m.monthly_cost)).toLocaleString()}
+                </p>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Monthly savings possible</p>
+              </div>
+              
+              <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                isDarkMode 
+                  ? 'bg-gray-950 border-gray-800' 
+                  : 'bg-cloud-white border-sky-gray'
+              }`}>
+                <div className="flex items-center space-x-2">
+                  <Icon name="Clock" size={16} className="text-mist-teal" />
+                  <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Best Latency</span>
+                </div>
+                <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+                  {Math.min(...rankedModels.map(m => m.p90_latency_ms))}ms
+                </p>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>P90 response time</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Model Cards Grid + Sidebar - 2/3 + 1/3 Layout */}
+          <div className="flex gap-6">
+            {/* Model Cards Grid - 2/3 width */}
+            <div className="flex-1">
+              <ModelRanking 
+                rankedModels={rankedModels}
+                workloadParams={workloadParams}
+                showHeaderAndStats={false}
+                showFooter={false}
+              />
+            </div>
+
+            {/* Sidebar - 1/3 width */}
+            <div className="w-80 h-100 flex-shrink-0">
+              <WorkloadParams 
+                params={workloadParams}
+                onChange={handleWorkloadParamsChange}
+                className='h-[100%]'
+                originalStructuredData={dashboardData?.originalStructuredData}
+                onApiUpdate={processStructuredData}
+              />
+            </div>
+          </div>
+
+          {/* Footer Note - Full Width */}
+          <div className={`w-full rounded-lg p-4 border transition-colors duration-300 ${
             isDarkMode 
               ? 'bg-gray-950 border-gray-800' 
-              : 'bg-cloud-white border-sky-gray'
+              : 'bg-muted-indigo/5 border-muted-indigo/20'
           }`}>
-            <div className="flex items-center space-x-2">
-              <Icon name="Zap" size={16} className="text-muted-indigo" />
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Models Analyzed</span>
+            <div className="flex items-start space-x-3">
+              <Icon name="Info" size={16} className="text-muted-indigo mt-0.5" />
+              <div>
+                <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+                  Model Ranking Methodology
+                </p>
+                <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
+                  Rankings are based on composite scores considering cost efficiency, latency performance, 
+                  reliability metrics, and feature capabilities. Higher scores indicate better overall value.
+                </p>
+              </div>
             </div>
-            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>{rankedModels.length}</p>
-            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Performance ranked</p>
-          </div>
-          
-          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-            isDarkMode 
-              ? 'bg-gray-950 border-gray-800' 
-              : 'bg-cloud-white border-sky-gray'
-          }`}>
-            <div className="flex items-center space-x-2">
-              <Icon name="DollarSign" size={16} className="text-calm-green" />
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Best Cost</span>
-            </div>
-            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
-              ${Math.min(...rankedModels.map(m => m.monthly_cost)).toLocaleString()}
-            </p>
-            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Monthly savings possible</p>
-          </div>
-          
-          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-            isDarkMode 
-              ? 'bg-gray-950 border-gray-800' 
-              : 'bg-cloud-white border-sky-gray'
-          }`}>
-            <div className="flex items-center space-x-2">
-              <Icon name="Clock" size={16} className="text-mist-teal" />
-              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Best Latency</span>
-            </div>
-            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
-              {Math.min(...rankedModels.map(m => m.p90_latency_ms))}ms
-            </p>
-            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>P90 response time</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Model Cards Grid + Sidebar - 2/3 + 1/3 Layout */}
-      <div className="flex gap-6">
-        {/* Model Cards Grid - 2/3 width */}
-        <div className="flex-1">
-          <ModelRanking 
-            rankedModels={rankedModels}
-            workloadParams={workloadParams}
-            showHeaderAndStats={false}
-            showFooter={false}
-          />
-        </div>
-
-        {/* Sidebar - 1/3 width */}
-        <div className="w-80 h-100 flex-shrink-0">
-          <WorkloadParams 
-            params={workloadParams}
-            onChange={handleWorkloadParamsChange}
-            className='h-[100%]'
-            originalStructuredData={dashboardData?.originalStructuredData}
-            onApiUpdate={processStructuredData}
-          />
-        </div>
-      </div>
-
-      {/* Footer Note - Full Width */}
-      <div className={`w-full rounded-lg p-4 border transition-colors duration-300 ${
-        isDarkMode 
-          ? 'bg-gray-950 border-gray-800' 
-          : 'bg-muted-indigo/5 border-muted-indigo/20'
-      }`}>
-        <div className="flex items-start space-x-3">
-          <Icon name="Info" size={16} className="text-muted-indigo mt-0.5" />
-          <div>
-            <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
-              Model Ranking Methodology
-            </p>
-            <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
-              Rankings are based on composite scores considering cost efficiency, latency performance, 
-              reliability metrics, and feature capabilities. Higher scores indicate better overall value.
-            </p>
           </div>
         </div>
       </div>

@@ -9,6 +9,39 @@ export const API_CONFIG = {
   RETRY_DELAY: 1000, // 1 second
 };
 
+// OpenAI Configuration
+export const OPENAI_CONFIG = {
+  API_KEY: import.meta.env.VITE_OPENAI_API_KEY,
+  BASE_URL: 'https://api.openai.com/v1',
+  DEFAULT_MODEL: 'gpt-3.5-turbo',
+  MODELS: {
+    GPT_4: 'gpt-4',
+    GPT_4_TURBO: 'gpt-4-turbo',
+    GPT_4O: 'gpt-4o',
+    GPT_4O_MINI: 'gpt-4o-mini',
+    GPT_3_5_TURBO: 'gpt-3.5-turbo',
+  },
+  PRICING: {
+    'gpt-4': { input: 0.03, output: 0.06 },
+    'gpt-4-turbo': { input: 0.01, output: 0.03 },
+    'gpt-3.5-turbo': { input: 0.001, output: 0.002 },
+    'gpt-4o': { input: 0.005, output: 0.015 },
+    'gpt-4o-mini': { input: 0.00015, output: 0.0006 }
+  },
+  DEFAULT_PARAMS: {
+    temperature: 0.7,
+    max_tokens: 1000,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+  },
+  LIMITS: {
+    MAX_TOKENS_GPT_4: 8192,
+    MAX_TOKENS_GPT_3_5: 4096,
+    MAX_CONTEXT_LENGTH: 16385,
+  }
+};
+
 // HTTP Status Codes
 export const HTTP_STATUS = {
   OK: 200,

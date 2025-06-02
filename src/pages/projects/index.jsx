@@ -6,6 +6,7 @@ import Icon from '../../components/AppIcon';
 import SideNavBar from '../../components/SideNavBar';
 import { ProjectGradientCard } from '../../components/ProjectGradientCard';
 import { getDynamicStyles } from '../../utils/darkModeStyles';
+import { SplashCursor } from '../../components/ui/splash-cursor';
 
 const ProjectsPage = () => {
   const navigate = useNavigate();
@@ -112,7 +113,12 @@ const ProjectsPage = () => {
   });
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'dark bg-black' : 'bg-cloud-white'}`}>
+    <div className="min-h-screen bg-black relative">
+      {/* Splash Cursor Background */}
+      <div className="fixed inset-0 z-0">
+        <SplashCursor />
+      </div>
+      
       {/* SideNavBar Component */}
       <SideNavBar
         isOpen={isSidebarOpen}
@@ -120,71 +126,73 @@ const ProjectsPage = () => {
       />
 
       {/* Header */}
-      <header className={styles.HEADER.MAIN}>
-        <div className={styles.HEADER.CONTENT}>
-          <div className={styles.HEADER.INNER}>
-            {/* Left Side */}
-            <div className={styles.HEADER.LEFT_SECTION}>
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className={styles.BUTTONS.MENU}
-              >
-                <Icon name="Menu" size={24} />
-              </button>
-              <div className={styles.HEADER.LOGO_SECTION}>
-                <div className={styles.HEADER.LOGO}>
-                  <span className="text-white font-bold text-sm">AI</span>
-                </div>
-                <h1 className={styles.HEADER.TITLE}>AI Cost Optimizer</h1>
-              </div>
-            </div>
-
-            {/* Right Side - User Menu */}
-            <div className="flex items-center space-x-4">
-              {/* Dark Mode Toggle */}
-              <button
-                onClick={toggleDarkMode}
-                className={`p-2 transition-colors duration-200 rounded-lg ${
-                  isDarkMode 
-                    ? 'text-yellow-400 hover:text-yellow-300 hover:bg-gray-900' 
-                    : 'text-slate-gray hover:text-charcoal-black hover:bg-fog-gray'
-                }`}
-                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              >
-                <Icon name={isDarkMode ? 'Sun' : 'Moon'} size={20} />
-              </button>
-
-              {/* User Menu */}
-              <div className="relative">
+      <header className="bg-black shadow-sm border-b relative z-10">
+        <div className={styles.HEADER.MAIN}>
+          <div className={styles.HEADER.CONTENT}>
+            <div className={styles.HEADER.INNER}>
+              {/* Left Side */}
+              <div className={styles.HEADER.LEFT_SECTION}>
                 <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className={styles.BUTTONS.USER}
+                  onClick={() => setIsSidebarOpen(true)}
+                  className={styles.BUTTONS.MENU}
                 >
-                  <div className={styles.UI.AVATAR}>
-                    <span className="text-white font-medium text-sm">
-                      {user?.email?.charAt(0).toUpperCase() || 'U'}
-                    </span>
+                  <Icon name="Menu" size={24} />
+                </button>
+                <div className={styles.HEADER.LOGO_SECTION}>
+                  <div className={styles.HEADER.LOGO}>
+                    <span className="text-white font-bold text-sm">AI</span>
                   </div>
-                  <Icon name="ChevronDown" size={16} className={isDarkMode ? 'text-gray-300' : 'text-slate-gray'} />
+                  <h1 className={styles.HEADER.TITLE}>AI Cost Optimizer</h1>
+                </div>
+              </div>
+
+              {/* Right Side - User Menu */}
+              <div className="flex items-center space-x-4">
+                {/* Dark Mode Toggle */}
+                <button
+                  onClick={toggleDarkMode}
+                  className={`p-2 transition-colors duration-200 rounded-lg ${
+                    isDarkMode 
+                      ? 'text-yellow-400 hover:text-yellow-300 hover:bg-gray-900' 
+                      : 'text-slate-gray hover:text-charcoal-black hover:bg-fog-gray'
+                  }`}
+                  title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                >
+                  <Icon name={isDarkMode ? 'Sun' : 'Moon'} size={20} />
                 </button>
 
-                {isUserMenuOpen && (
-                  <div className={styles.UI.DROPDOWN}>
-                    <button className={styles.UI.DROPDOWN_ITEM}>
-                      Profile Settings
-                    </button>
-                    <button className={styles.UI.DROPDOWN_ITEM}>
-                      Account Settings
-                    </button>
-                    <hr className={`my-1 ${isDarkMode ? 'border-gray-800' : 'border-sky-gray'}`} />
-                    <button 
-                      onClick={handleSignOutClick}
-                      className={styles.UI.SIGN_OUT_ITEM}
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                )}
+                {/* User Menu */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className={styles.BUTTONS.USER}
+                  >
+                    <div className={styles.UI.AVATAR}>
+                      <span className="text-white font-medium text-sm">
+                        {user?.email?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                    <Icon name="ChevronDown" size={16} className={isDarkMode ? 'text-gray-300' : 'text-slate-gray'} />
+                  </button>
+
+                  {isUserMenuOpen && (
+                    <div className={styles.UI.DROPDOWN}>
+                      <button className={styles.UI.DROPDOWN_ITEM}>
+                        Profile Settings
+                      </button>
+                      <button className={styles.UI.DROPDOWN_ITEM}>
+                        Account Settings
+                      </button>
+                      <hr className={`my-1 ${isDarkMode ? 'border-gray-800' : 'border-sky-gray'}`} />
+                      <button 
+                        onClick={handleSignOutClick}
+                        className={styles.UI.SIGN_OUT_ITEM}
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -239,7 +247,7 @@ const ProjectsPage = () => {
           {/* Create New Project Card */}
           <div
             onClick={handleCreateProject}
-            className="group cursor-pointer"
+            className="group cursor-pointer z-20"
           >
             <div 
               className={`border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-all duration-300 shadow-mist ${

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { Button } from '../components/ui/button';
+import { SplashCursor } from '../components/ui/splash-cursor';
 import { 
   ChartBar, 
   Target, 
@@ -124,9 +125,14 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-black text-white' : 'bg-cloud-white text-charcoal-black'}`}>
+    <div className={`min-h-screen transition-colors duration-300 relative ${isDarkMode ? 'bg-black text-white' : 'bg-cloud-white text-charcoal-black'}`}>
+      {/* Splash Cursor Background */}
+      <div className="fixed inset-0 z-0">
+        <SplashCursor />
+      </div>
+      
       {/* Header */}
-      <header className={`${isDarkMode ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-sky-gray'} backdrop-blur-sm border-b sticky top-0 z-50 transition-colors duration-300`}>
+      <header className={`${isDarkMode ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-sky-gray'} backdrop-blur-sm border-b sticky top-0 z-50 transition-colors duration-300 relative`}>
         <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -154,7 +160,7 @@ const LandingPage = () => {
               {/* Dark Mode Toggle */}
               <button
                 onClick={toggleDarkMode}
-                className={`p-2 transition-colors duration-200 rounded-lg ${
+                className={`p-2 transition-colors duration-200 rounded-lg z-20 ${
                   isDarkMode 
                     ? 'text-yellow-400 hover:text-yellow-300 hover:bg-gray-900' 
                     : 'text-slate-gray hover:text-charcoal-black hover:bg-fog-gray'
@@ -169,13 +175,13 @@ const LandingPage = () => {
             <div className="flex items-center space-x-4">
               <Link
                 to="/login"
-                className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-slate-gray hover:text-soft-navy'} transition-colors duration-200`}
+                className={`z-20 ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-slate-gray hover:text-soft-navy'} transition-colors duration-200`}
               >
                 Sign In
               </Link>
               <Link
                 to="/signup"
-                className="bg-muted-indigo hover:bg-muted-indigo/90 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                className="bg-muted-indigo hover:bg-muted-indigo/90 text-white px-4 py-2 rounded-lg transition-colors duration-200 z-20"
               >
                 Get Started
               </Link>
@@ -202,14 +208,14 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link
               to="/signup"
-              className="bg-muted-indigo hover:bg-muted-indigo/90 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl"
+              className="bg-muted-indigo hover:bg-muted-indigo/90 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl z-20"
             >
               <span>Start Free Trial</span>
               <ArrowRight size={20} />
             </Link>
             <Link
               to="/login"
-              className={`border-2 px-8 py-4 rounded-lg font-semibold transition-all duration-200 ${
+              className={`border-2 px-8 py-4 rounded-lg font-semibold transition-all duration-200 z-20 ${
                 isDarkMode 
                   ? 'border-gray-600 text-white hover:bg-gray-900' 
                   : 'border-muted-indigo text-muted-indigo hover:bg-muted-indigo/5'
@@ -381,7 +387,7 @@ const LandingPage = () => {
                 </ul>
                 
                 <Button
-                  className={`w-full ${
+                  className={`w-full z-20 ${
                     plan.popular 
                       ? 'bg-muted-indigo hover:bg-muted-indigo/90 text-white' 
                       : `${isDarkMode ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-fog-gray hover:bg-sky-gray text-soft-navy'}`
@@ -408,7 +414,7 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/signup"
-              className="bg-muted-indigo hover:bg-muted-indigo/90 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl"
+              className="bg-muted-indigo hover:bg-muted-indigo/90 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl z-20"
             >
               <span>Start Free Trial</span>
               <ArrowRight size={20} />

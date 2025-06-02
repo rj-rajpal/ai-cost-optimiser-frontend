@@ -50,7 +50,7 @@ export const getButtonStyles = (isDarkMode) => ({
   SEND: "ml-2 p-2 rounded-full bg-muted-indigo hover:bg-muted-indigo/90 transition-colors disabled:opacity-50",
   SIDEBAR: "w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors duration-200",
   CLOSE: "mb-4 p-2 rounded-md hover:bg-white/10 transition-colors duration-200",
-  TAB: "py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200",
+  TAB: "py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200 z-20",
   TAB_ACTIVE: `border-muted-indigo transition-colors duration-300 ${
     isDarkMode ? 'text-white' : 'text-muted-indigo'
   }`,
@@ -97,7 +97,7 @@ export const getUIStyles = (isDarkMode) => ({
  */
 export const getNavStyles = (isDarkMode) => ({
   BREADCRUMB: "flex items-center space-x-2 text-sm mb-4",
-  TABS_CONTAINER: "flex space-x-8 overflow-x-auto",
+  TABS_CONTAINER: "flex space-x-8 overflow-x-auto z-20",
   TITLE_CONTAINER: "flex items-center space-x-4",
   TITLE_ICON: `w-12 h-12 bg-gradient-to-r from-mist-teal/20 to-muted-indigo/20 rounded-lg flex items-center justify-center border ${
     isDarkMode ? 'border-gray-700' : 'border-sky-gray'
@@ -123,7 +123,7 @@ export const getCardStyles = (isDarkMode) => ({
   TITLE_SECTION: `flex flex-col px-4 sm:px-6 lg:px-8 py-6 transition-colors duration-300 ${
     isDarkMode ? 'bg-black' : 'bg-white'
   }`,
-  TABS_SECTION: `border-b px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+  TABS_SECTION: ` z-20border-b px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
     isDarkMode 
       ? 'bg-black border-gray-800' 
       : 'bg-white border-sky-gray'
