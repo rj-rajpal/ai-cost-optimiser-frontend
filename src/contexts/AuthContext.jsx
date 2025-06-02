@@ -40,11 +40,19 @@ export const AuthProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.email);
+        
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // Note: OAuth callbacks are handled by the dedicated /auth/callback route
-        // which uses getSessionFromUrl() to process the authentication
+
+        // Handle OAuth callback - clean up URL after successful sign in
+        if (event === 'SIGNED_IN' && session) {
+          // Check if we're on a page with OAuth callback parameters
+          if (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token')) {
+            // Clean up the URL by removing hash fragments
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+          }
+        }
       }
     );
 
@@ -111,7 +119,7 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/projects`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
