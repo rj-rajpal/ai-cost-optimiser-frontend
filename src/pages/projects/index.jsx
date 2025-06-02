@@ -1,394 +1,307 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 import Icon from '../../components/AppIcon';
+import SideNavBar from '../../components/SideNavBar';
+import { ProjectGradientCard } from '../../components/ProjectGradientCard';
+import { getDynamicStyles } from '../../utils/darkModeStyles';
 
 const ProjectsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [userProjects, setUserProjects] = useState([]);
-  const [activeProjectMenu, setActiveProjectMenu] = useState(null);
+
+  // Get dynamic styles based on dark mode
+  const styles = getDynamicStyles(isDarkMode);
 
   useEffect(() => {
     const fetchUserProjects = async () => {
       const hasProjects = Math.random() > 0.3; // 70% chance of having projects
       
-      if (hasProjects) {
-        setUserProjects([
+      // Get locally saved projects from projectService
+      let savedProjects = [];
+      try {
+        const localProjects = localStorage.getItem('ai_cost_projects');
+        if (localProjects) {
+          const parsedProjects = JSON.parse(localProjects);
+          savedProjects = Object.values(parsedProjects).map(project => ({
+            id: project.id,
+            name: project.title,
+            summary: project.final_recommendation?.substring(0, 100) + '...' || 'AI cost optimization analysis'
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading saved projects:', error);
+      }
+      
+      if (hasProjects || savedProjects.length > 0) {
+        const staticProjects = [
           {
-            id: 'rua-almadinah',
-            title: 'Rua Almadinah',
-            description: 'This project focuses on modern urban planning and the execution of diverse infrastructure solutions.',
+            "id": "customer-support-triage",
+            "name": "Customer Support Triage",
+            "summary": "Prioritises and drafts replies for incoming support emails to cut resolution time and agent workload."
           },
           {
-            id: 'rua-al-haram',
-            title: 'Rua Al Haram',
-            description: 'This project focuses on modern urban planning and the execution of diverse infrastructure solutions.',
+            "id": "invoice-processing-qa",
+            "name": "Invoice Processing & QA",
+            "summary": "Extracts line-items, flags anomalies, and reconciles invoices with PO data for faster month-end close."
           },
           {
-            id: 'trojena',
-            title: 'Trojena',
-            description: 'This project focuses on modern urban planning and the execution of diverse infrastructure solutions.',
+            "id": "marketing-content-localisation",
+            "name": "Marketing Content Localisation",
+            "summary": "Auto-translates and tone-matches product copy for global campaigns, keeping brand voice consistent."
           },
           {
-            id: 'urban-development',
-            title: 'Urban Development',
-            description: 'Modern metropolitan planning with sustainable infrastructure and smart city integration.',
-          },
-          {
-            id: 'residential-complex',
-            title: 'Residential Complex',
-            description: 'Contemporary residential development featuring eco-friendly design and community spaces.',
-          },
-          {
-            id: 'desert-sanctuary',
-            title: 'Desert Sanctuary',
-            description: 'Unique desert landscape project combining modern architecture with natural preservation.',
+            "id": "product-catalog-enrichment",
+            "name": "Product Catalog Enrichment",
+            "summary": "Generates rich titles, attributes, and SEO-friendly descriptions to boost search and conversions."
           }
-        ]);
+        ];
+        
+        // Combine saved projects with static ones (saved projects first)
+        setUserProjects([...savedProjects, ...staticProjects]);
       }
     };
 
     fetchUserProjects();
   }, []);
 
-  const navigationItems = [
-    { path: "/projects", label: "Projects", icon: "Grid3X3" },
-    { path: "/dashboard", label: "Dashboard", icon: "BarChart3" },
-    { path: "/data-upload", label: "Data Upload", icon: "Upload" },
-    { path: "/process-analysis", label: "Analysis", icon: "Search" },
-    { path: "/roi-calculator", label: "ROI Calculator", icon: "Calculator" },
-    { path: "/scenario-library", label: "Scenarios", icon: "BookOpen" },
-  ];
-
-  const chatHistory = [
-    { id: 1, title: "AI Cost Optimizer Theme", date: "today" },
-    { id: 2, title: "Project Architecture Setup", date: "today" },
-    { id: 3, title: "Dashboard Analytics Implementation", date: "yesterday" },
-    { id: 4, title: "ROI Calculator Logic", date: "yesterday" },
-    { id: 5, title: "Data Upload Validation", date: "2 days ago" },
-    { id: 6, title: "User Authentication Flow", date: "2 days ago" },
-    { id: 7, title: "Process Analysis Features", date: "3 days ago" },
-  ];
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
+  const handleSignOutClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsUserMenuOpen(false);
+    
+    try {
+      const result = await signOut();
+      
+      if (result?.error) {
+        console.error('Sign out error:', result.error);
+      }
+      
+      navigate('/login');
+    } catch (error) {
+      console.error('Sign out failed:', error);
+      navigate('/login');
+    }
   };
 
   const handleCreateProject = () => {
     navigate('/onboarding-wizard');
   };
 
-  const handleDeleteProject = (projectId) => {
-    setUserProjects(prev => prev.filter(project => project.id !== projectId));
-    setActiveProjectMenu(null);
+  const handleProjectClick = (projectId) => {
+    navigate(`/project/${projectId}`);
+  };
+
+  const handleProjectDelete = (projectId) => {
+    setUserProjects(userProjects.filter(p => p.id !== projectId));
   };
 
   const filteredProjects = userProjects.filter(project => {
-    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         project.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.summary.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
-  const renderChatHistorySection = (title, dateFilter) => (
-    <>
-      <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider mb-3 mt-6">
-        {title}
-      </h3>
-      {chatHistory
-        .filter(chat => chat.date === dateFilter)
-        .map((chat) => (
-          <button
-            key={chat.id}
-            className="w-full text-left p-3 rounded-lg hover:bg-white/10 transition-colors duration-200 mb-1"
-          >
-            <div className="text-sm text-white/90 truncate">{chat.title}</div>
-          </button>
-        ))}
-    </>
-  );
-
   return (
-    <div className="min-h-screen bg-cloud-white">
-      {/* Sidebar Overlay */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 z-40" 
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-80 bg-soft-navy text-white z-50 transform transition-transform duration-300 ease-in-out ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="p-4 border-b border-white/10">
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="mb-4 p-2 rounded-md hover:bg-white/10 transition-colors duration-200"
-            >
-              <Icon name="X" size={20} />
-            </button>
-            
-            <button className="w-full flex items-center space-x-3 p-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors duration-200">
-              <Icon name="Edit3" size={16} />
-              <span>New chat</span>
-            </button>
-          </div>
-
-          {/* Sidebar Content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <button className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors duration-200 mb-4">
-              <Icon name="Search" size={16} />
-              <span>Search chats</span>
-            </button>
-
-            <button className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors duration-200 mb-4">
-              <Icon name="BookOpen" size={16} />
-              <span>Library</span>
-            </button>
-
-            {/* Navigation Items */}
-            <div className="mb-6">
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setIsSidebarOpen(false)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200 mb-1 ${
-                    location.pathname === item.path
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  <Icon name={item.icon} size={16} />
-                  <span>{item.label}</span>
-                </Link>
-              ))}
-            </div>
-
-            {/* Chat History */}
-            <div className="mb-6">
-              <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider mb-3">Today</h3>
-              {chatHistory
-                .filter(chat => chat.date === 'today')
-                .map((chat) => (
-                  <button
-                    key={chat.id}
-                    className="w-full text-left p-3 rounded-lg hover:bg-white/10 transition-colors duration-200 mb-1"
-                  >
-                    <div className="text-sm text-white/90 truncate">{chat.title}</div>
-                  </button>
-                ))}
-              
-              {renderChatHistorySection("Yesterday", "yesterday")}
-              {renderChatHistorySection("Previous 7 days", "2 days ago")}
-            </div>
-          </div>
-
-          {/* Sidebar Footer */}
-          <div className="p-4 border-t border-white/10">
-            <button className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors duration-200">
-              <div className="w-6 h-6 bg-gradient-to-r from-muted-indigo to-mist-teal rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium">
-                  {user?.email?.charAt(0).toUpperCase() || 'U'}
-                </span>
-              </div>
-              <div className="flex-1 text-left">
-                <div className="text-sm text-white/90">Upgrade plan</div>
-                <div className="text-xs text-white/50">More access to the best models</div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'dark bg-black' : 'bg-cloud-white'}`}>
+      {/* SideNavBar Component */}
+      <SideNavBar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-sky-gray sticky top-0 z-30 shadow-mist">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <header className={styles.HEADER.MAIN}>
+        <div className={styles.HEADER.CONTENT}>
+          <div className={styles.HEADER.INNER}>
             {/* Left Side */}
-            <div className="flex items-center space-x-4">
+            <div className={styles.HEADER.LEFT_SECTION}>
               <button
                 onClick={() => setIsSidebarOpen(true)}
-                className="p-2 rounded-md text-soft-navy hover:bg-fog-gray transition-colors duration-200"
+                className={styles.BUTTONS.MENU}
               >
                 <Icon name="Menu" size={24} />
               </button>
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-muted-indigo rounded-lg flex items-center justify-center border border-sky-gray">
+              <div className={styles.HEADER.LOGO_SECTION}>
+                <div className={styles.HEADER.LOGO}>
                   <span className="text-white font-bold text-sm">AI</span>
                 </div>
-                <h1 className="text-xl font-semibold text-soft-navy">AI Cost Optimizer</h1>
+                <h1 className={styles.HEADER.TITLE}>AI Cost Optimizer</h1>
               </div>
             </div>
 
-            {/* Right Side */}
-            <div className="relative">
+            {/* Right Side - User Menu */}
+            <div className="flex items-center space-x-4">
+              {/* Dark Mode Toggle */}
               <button
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-fog-gray transition-colors duration-200"
+                onClick={toggleDarkMode}
+                className={`p-2 transition-colors duration-200 rounded-lg ${
+                  isDarkMode 
+                    ? 'text-yellow-400 hover:text-yellow-300 hover:bg-gray-900' 
+                    : 'text-slate-gray hover:text-charcoal-black hover:bg-fog-gray'
+                }`}
+                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-muted-indigo to-mist-teal flex items-center justify-center">
-                  <span className="text-white font-medium text-sm">
-                    {user?.email?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-                <Icon name="ChevronDown" size={16} className="text-slate-gray" />
+                <Icon name={isDarkMode ? 'Sun' : 'Moon'} size={20} />
               </button>
 
-              {/* User Dropdown */}
-              {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-mist border border-sky-gray py-1 z-50">
-                  <button className="w-full px-4 py-2 text-left text-charcoal-black hover:bg-fog-gray transition-colors duration-200">
-                    Profile Settings
-                  </button>
-                  <button className="w-full px-4 py-2 text-left text-charcoal-black hover:bg-fog-gray transition-colors duration-200">
-                    Account Settings
-                  </button>
-                  <hr className="my-1 border-sky-gray" />
-                  <button 
-                    onClick={handleSignOut}
-                    className="w-full px-4 py-2 text-left text-red-600 hover:bg-soft-rose transition-colors duration-200"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
+              {/* User Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className={styles.BUTTONS.USER}
+                >
+                  <div className={styles.UI.AVATAR}>
+                    <span className="text-white font-medium text-sm">
+                      {user?.email?.charAt(0).toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                  <Icon name="ChevronDown" size={16} className={isDarkMode ? 'text-gray-300' : 'text-slate-gray'} />
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className={styles.UI.DROPDOWN}>
+                    <button className={styles.UI.DROPDOWN_ITEM}>
+                      Profile Settings
+                    </button>
+                    <button className={styles.UI.DROPDOWN_ITEM}>
+                      Account Settings
+                    </button>
+                    <hr className={`my-1 ${isDarkMode ? 'border-gray-800' : 'border-sky-gray'}`} />
+                    <button 
+                      onClick={handleSignOutClick}
+                      className={styles.UI.SIGN_OUT_ITEM}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="p-4 sm:p-6 lg:p-8">
-        {/* Page Title with Search */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-soft-navy mb-2">Projects</h1>
-            <p className="text-slate-gray">Manage and track your AI optimization projects</p>
-          </div>
-          
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-80 px-4 py-2 bg-white border border-sky-gray rounded-lg text-charcoal-black placeholder-slate-gray focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo transition-all duration-200"
-            />
-            <Icon name="Search" size={20} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-gray" />
+      <main className={`p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto transition-colors duration-300 ${
+        isDarkMode ? 'text-white' : ''
+      }`}>
+        {/* Page Header */}
+        <div className="mb-8">
+          {/* Breadcrumb Navigation */}
+          <nav className={styles.NAV_STYLES.BREADCRUMB}>
+            <Link to="/" className={styles.BUTTONS.BREADCRUMB}>
+              Home
+            </Link>
+            <Icon name="ChevronRight" size={16} className={isDarkMode ? 'text-gray-600' : 'text-slate-gray'} />
+            <span className={styles.TEXT.BREADCRUMB}>Projects</span>
+          </nav>
+
+          {/* Title Section */}
+          <div className="flex flex-row items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className={styles.NAV_STYLES.TITLE_ICON}>
+                <Icon name="FolderOpen" size={24} className="text-muted-indigo" />
+              </div>
+              <div>
+                <h1 className={styles.TEXT.TITLE_SECTION}>PROJECTS</h1>
+                <p className={styles.TEXT.SUBTITLE}>
+                  Manage and optimize your AI cost projects
+                </p>
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+              <Icon name="Search" size={20} className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`} />
+              <input
+                type="text"
+                placeholder="Search projects..."
+                className={`w-80 pl-10 pr-4 py-2 ${styles.FORMS.INPUT.replace('w-full', '')}`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {/* Create New Project Card */}
-          <div 
+          <div
             onClick={handleCreateProject}
             className="group cursor-pointer"
           >
-            <div className="aspect-[4/3] bg-white/80 border-2 border-dashed border-sky-gray rounded-xl flex flex-col items-center justify-center hover:border-muted-indigo hover:bg-white transition-all duration-300 shadow-mist">
-              <div className="w-16 h-16 bg-muted-indigo/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-muted-indigo/20 transition-colors duration-300">
+            <div 
+              className={`border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-all duration-300 shadow-mist ${
+                isDarkMode 
+                  ? 'bg-black border-gray-800 hover:border-muted-indigo hover:bg-gray-950' 
+                  : 'bg-white/80 border-sky-gray hover:border-muted-indigo hover:bg-white'
+              }`}
+              style={{ height: "280px" }}
+            >
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors duration-300 ${
+                isDarkMode 
+                  ? 'bg-muted-indigo/20 group-hover:bg-muted-indigo/30' 
+                  : 'bg-muted-indigo/10 group-hover:bg-muted-indigo/20'
+              }`}>
                 <Icon name="Plus" size={32} className="text-muted-indigo" />
               </div>
-              <h3 className="text-xl font-semibold text-soft-navy mb-2">Create new</h3>
-              <p className="text-slate-gray text-center px-4">Start a new AI optimization project</p>
+              <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+                Create new
+              </h3>
+              <p className={`text-center px-4 ${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>
+                Start a new AI optimization project
+              </p>
             </div>
           </div>
 
           {/* Project Cards */}
           {filteredProjects.map((project) => (
-            <div key={project.id} className="cursor-pointer">
-              <div className="aspect-[4/3] bg-white backdrop-blur-sm rounded-xl overflow-hidden border border-sky-gray shadow-mist transition-all duration-300 flex flex-col justify-between p-6 relative">
-                {/* Three Dots Menu */}
-                <div className="absolute top-4 right-4">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveProjectMenu(activeProjectMenu === project.id ? null : project.id);
-                    }}
-                    className="text-slate-gray hover:text-soft-navy transition-colors duration-200 p-1"
-                  >
-                    <Icon name="MoreHorizontal" size={20} />
-                  </button>
-                  
-                  {/* Delete Dropdown */}
-                  {activeProjectMenu === project.id && (
-                    <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-mist border border-sky-gray py-1 z-50">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteProject(project.id);
-                        }}
-                        className="w-full px-3 py-2 text-left text-red-600 hover:bg-soft-rose transition-colors duration-200 flex items-center space-x-2"
-                      >
-                        <Icon name="Trash2" size={16} />
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Project Content */}
-                <div className="flex-1 flex flex-col justify-center">
-                  <div className="mb-4">
-                    <h3 className="text-xl font-semibold text-soft-navy transition-colors duration-200">
-                      {project.title}
-                    </h3>
-                  </div>
-                  
-                  <p className="text-slate-gray text-center">
-                    {project.description}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <ProjectGradientCard 
+              key={project.id} 
+              project={project} 
+              onProjectClick={handleProjectClick}
+              onProjectDelete={handleProjectDelete} 
+            />
           ))}
         </div>
 
-        {/* Empty State */}
-        {userProjects.length === 0 && (
+        {/* Filtered State */}
+        {filteredProjects.length === 0 && userProjects.length > 0 && (
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
-              <div className="w-24 h-24 bg-fog-gray rounded-full flex items-center justify-center mx-auto mb-6">
-                <Icon name="FolderPlus" size={48} className="text-slate-gray" />
+              <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                isDarkMode ? 'bg-gray-900' : 'bg-fog-gray'
+              }`}>
+                <Icon name="Search" size={48} className={isDarkMode ? 'text-gray-400' : 'text-slate-gray'} />
               </div>
-              <h3 className="text-2xl font-semibold text-soft-navy mb-4">No projects yet</h3>
-              <p className="text-slate-gray mb-6">
-                Get started by creating your first AI optimization project. 
-                Our wizard will guide you through the setup process.
+              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+                No projects found
+              </h3>
+              <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>
+                We couldn't find any projects matching "{searchQuery}".
+                Try adjusting your search terms.
               </p>
               <button
-                onClick={handleCreateProject}
+                onClick={() => setSearchQuery('')}
                 className="inline-flex items-center px-6 py-3 bg-muted-indigo hover:bg-muted-indigo/90 text-white font-medium rounded-lg transition-colors duration-200 shadow-mist"
               >
-                <Icon name="Plus" size={20} className="mr-2" />
-                Create Your First Project
+                Clear Search
               </button>
             </div>
           </div>
         )}
       </main>
-
-      {/* Click Outside Handler */}
-      {(isUserMenuOpen || activeProjectMenu) && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => {
-            setIsUserMenuOpen(false);
-            setActiveProjectMenu(null);
-          }}
-        />
-      )}
     </div>
   );
 };

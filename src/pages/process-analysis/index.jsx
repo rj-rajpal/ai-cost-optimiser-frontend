@@ -1,7 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/ui/Header';
-import Breadcrumb from '../../components/ui/Breadcrumb';
 import Icon from '../../components/AppIcon';
 import ProcessTable from './components/ProcessTable';
 import FilterPanel from './components/FilterPanel';
@@ -276,78 +274,38 @@ Manual inspection process requires 2 quality control specialists working full-ti
   const activeFilterCount = Object.values(filters).filter(value => value && value.length > 0).length;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="pt-16">
-        <div className="p-6">
-          {/* Page Header */}
-          <div className="mb-6">
-            <Breadcrumb />
-            <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary font-heading">
-                  Process Analysis
-                </h1>
-                <p className="mt-1 text-text-secondary">
-                  Evaluate automation opportunities and calculate ROI for business processes
-                </p>
-              </div>
-              
-              <div className="mt-4 sm:mt-0 flex items-center space-x-3">
-                <button
-                  onClick={handleExportData}
-                  className="flex items-center space-x-2 px-4 py-2 bg-surface text-text-primary border border-border rounded-md hover:bg-surface-700 transition-colors duration-200"
-                >
-                  <Icon name="Download" size={16} />
-                  <span>Export</span>
-                </button>
-                
-                <button
-                  onClick={() => navigate('/roi-calculator')}
-                  className="flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-700 transition-colors duration-200"
-                >
-                  <Icon name="Calculator" size={16} />
-                  <span>ROI Calculator</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Filters and Summary */}
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mb-6">
-            <div className="xl:col-span-3">
-              <FilterPanel
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                activeFilterCount={activeFilterCount}
-                totalProcesses={processData.length}
-                filteredCount={filteredAndSortedProcesses.length}
-              />
-            </div>
-            
-            <div className="xl:col-span-1">
-              <SummaryPanel
-                processes={filteredAndSortedProcesses}
-                selectedProcesses={selectedProcesses}
-                onGenerateReport={handleGenerateReport}
-                onScheduleReview={handleScheduleReview}
-              />
-            </div>
-          </div>
-
-          {/* Process Table */}
-          <div className="bg-surface border border-border rounded-lg shadow-base">
-            <ProcessTable
-              processes={filteredAndSortedProcesses}
-              selectedProcesses={selectedProcesses}
-              onProcessSelection={handleProcessSelection}
-              sortConfig={sortConfig}
-              onSort={handleSort}
-            />
-          </div>
+    <div className="bg-cloud-white">
+      {/* Filter and Summary Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        <div className="lg:col-span-3">
+          <FilterPanel 
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onExportData={handleExportData}
+            onGenerateReport={handleGenerateReport}
+            onScheduleReview={handleScheduleReview}
+            selectedCount={selectedProcesses.length}
+          />
         </div>
-      </main>
+        <div className="lg:col-span-1">
+          <SummaryPanel 
+            totalProcesses={filteredAndSortedProcesses.length}
+            totalSavings={filteredAndSortedProcesses.reduce((sum, p) => sum + p.annualSavings, 0)}
+            avgPayback={filteredAndSortedProcesses.reduce((sum, p) => sum + p.paybackMonths, 0) / filteredAndSortedProcesses.length || 0}
+            avgROI={filteredAndSortedProcesses.reduce((sum, p) => sum + p.roiPercentage, 0) / filteredAndSortedProcesses.length || 0}
+          />
+        </div>
+      </div>
+
+      {/* Process Table */}
+      <ProcessTable 
+        processes={filteredAndSortedProcesses}
+        selectedProcesses={selectedProcesses}
+        sortConfig={sortConfig}
+        onProcessSelection={handleProcessSelection}
+        onSort={handleSort}
+        onNavigate={navigate}
+      />
     </div>
   );
 };

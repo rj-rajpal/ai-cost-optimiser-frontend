@@ -9,6 +9,8 @@ import * as processService from './processService';
 import * as dataService from './dataService';
 import * as analyticsService from './analyticsService';
 import * as scenarioService from './scenarioService';
+import chatService from './chatService';
+import projectService from './projectService';
 
 // Export all services
 export {
@@ -17,6 +19,8 @@ export {
   dataService,
   analyticsService,
   scenarioService,
+  chatService,
+  projectService,
 };
 
 // Export individual service functions for direct import
@@ -58,4 +62,14 @@ export const {
   updateScenario,
   deleteScenario,
   duplicateScenario,
-} = scenarioService; 
+} = scenarioService;
+
+// Export chat service methods for direct import
+export const {
+  sendInteractiveMessage,
+  updateWorkloadParams,
+  compareModels,
+  getROIAnalysis,
+  formatCost,
+  calculateSavings,
+} = chatService; 

@@ -1,346 +1,267 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '../../components/ui/Header';
-import Breadcrumb from '../../components/ui/Breadcrumb';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDashboard } from '../../contexts/DashboardContext';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 import Icon from '../../components/AppIcon';
-import ProviderCard from './components/ProviderCard';
-import AssumptionPanel from './components/AssumptionPanel';
-import ScenarioComparison from './components/ScenarioComparison';
+import WorkloadParams from '../../components/WorkloadParams';
+import ROICard from '../../components/ROICard';
 
 const ROICalculator = () => {
   const navigate = useNavigate();
-  const [assumptions, setAssumptions] = useState({
-    taskFrequency: 1000,
-    modelType: 'gpt-4',
-    latencyTarget: 500,
-    dataVolume: 50,
-    concurrentUsers: 10
+  const { projectId } = useParams();
+  const { dashboardData, isLoading: dashboardLoading, processStructuredData } = useDashboard();
+  const { isDarkMode } = useDarkMode();
+  
+  // Workload parameters state
+  const [workloadParams, setWorkloadParams] = useState({
+    calls_per_day: 1000,
+    avg_input_tokens: 150,
+    avg_output_tokens: 100,
+    latency_sla_ms: 500
   });
 
-  const [scenarios, setScenarios] = useState([]);
+  // Estimated monthly spend state
+  const [estimatedMonthlySpend, setEstimatedMonthlySpend] = useState(5000);
 
-  const providers = [
-    {
-      id: 'openai',
-      name: 'OpenAI',
-      logo: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=100&h=100&fit=crop&crop=center',
-      color: 'bg-green-500',
-      metrics: {
-        tokenCost: 0.03,
-        latency: 450,
-        reliability: 99.9,
-        features: 95
-      },
-      costAllocation: [
-        { name: 'Compute', value: 45, color: '#22C55E' },
-        { name: 'Storage', value: 25, color: '#3B82F6' },
-        { name: 'Network', value: 20, color: '#F59E0B' },
-        { name: 'Support', value: 10, color: '#EF4444' }
-      ],
-      priceHistory: [
-        { day: 1, price: 0.032 },
-        { day: 2, price: 0.031 },
-        { day: 3, price: 0.030 },
-        { day: 4, price: 0.029 },
-        { day: 5, price: 0.030 },
-        { day: 6, price: 0.031 },
-        { day: 7, price: 0.030 },
-        { day: 8, price: 0.029 },
-        { day: 9, price: 0.030 },
-        { day: 10, price: 0.031 },
-        { day: 11, price: 0.030 },
-        { day: 12, price: 0.029 },
-        { day: 13, price: 0.030 },
-        { day: 14, price: 0.031 },
-        { day: 15, price: 0.030 },
-        { day: 16, price: 0.029 },
-        { day: 17, price: 0.030 },
-        { day: 18, price: 0.031 },
-        { day: 19, price: 0.030 },
-        { day: 20, price: 0.029 },
-        { day: 21, price: 0.030 },
-        { day: 22, price: 0.031 },
-        { day: 23, price: 0.030 },
-        { day: 24, price: 0.029 },
-        { day: 25, price: 0.030 },
-        { day: 26, price: 0.031 },
-        { day: 27, price: 0.030 },
-        { day: 28, price: 0.029 },
-        { day: 29, price: 0.030 },
-        { day: 30, price: 0.030 }
-      ]
-    },
-    {
-      id: 'anthropic',
-      name: 'Anthropic',
-      logo: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=100&h=100&fit=crop&crop=center',
-      color: 'bg-purple-500',
-      metrics: {
-        tokenCost: 0.025,
-        latency: 520,
-        reliability: 99.8,
-        features: 88
-      },
-      costAllocation: [
-        { name: 'Compute', value: 50, color: '#8B5CF6' },
-        { name: 'Storage', value: 22, color: '#3B82F6' },
-        { name: 'Network', value: 18, color: '#F59E0B' },
-        { name: 'Support', value: 10, color: '#EF4444' }
-      ],
-      priceHistory: [
-        { day: 1, price: 0.027 },
-        { day: 2, price: 0.026 },
-        { day: 3, price: 0.025 },
-        { day: 4, price: 0.024 },
-        { day: 5, price: 0.025 },
-        { day: 6, price: 0.026 },
-        { day: 7, price: 0.025 },
-        { day: 8, price: 0.024 },
-        { day: 9, price: 0.025 },
-        { day: 10, price: 0.026 },
-        { day: 11, price: 0.025 },
-        { day: 12, price: 0.024 },
-        { day: 13, price: 0.025 },
-        { day: 14, price: 0.026 },
-        { day: 15, price: 0.025 },
-        { day: 16, price: 0.024 },
-        { day: 17, price: 0.025 },
-        { day: 18, price: 0.026 },
-        { day: 19, price: 0.025 },
-        { day: 20, price: 0.024 },
-        { day: 21, price: 0.025 },
-        { day: 22, price: 0.026 },
-        { day: 23, price: 0.025 },
-        { day: 24, price: 0.024 },
-        { day: 25, price: 0.025 },
-        { day: 26, price: 0.026 },
-        { day: 27, price: 0.025 },
-        { day: 28, price: 0.024 },
-        { day: 29, price: 0.025 },
-        { day: 30, price: 0.025 }
-      ]
-    },
-    {
-      id: 'gemini',
-      name: 'Google Gemini',
-      logo: 'https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=100&h=100&fit=crop&crop=center',
-      color: 'bg-blue-500',
-      metrics: {
-        tokenCost: 0.028,
-        latency: 380,
-        reliability: 99.7,
-        features: 92
-      },
-      costAllocation: [
-        { name: 'Compute', value: 48, color: '#3B82F6' },
-        { name: 'Storage', value: 28, color: '#10B981' },
-        { name: 'Network', value: 16, color: '#F59E0B' },
-        { name: 'Support', value: 8, color: '#EF4444' }
-      ],
-      priceHistory: [
-        { day: 1, price: 0.030 },
-        { day: 2, price: 0.029 },
-        { day: 3, price: 0.028 },
-        { day: 4, price: 0.027 },
-        { day: 5, price: 0.028 },
-        { day: 6, price: 0.029 },
-        { day: 7, price: 0.028 },
-        { day: 8, price: 0.027 },
-        { day: 9, price: 0.028 },
-        { day: 10, price: 0.029 },
-        { day: 11, price: 0.028 },
-        { day: 12, price: 0.027 },
-        { day: 13, price: 0.028 },
-        { day: 14, price: 0.029 },
-        { day: 15, price: 0.028 },
-        { day: 16, price: 0.027 },
-        { day: 17, price: 0.028 },
-        { day: 18, price: 0.029 },
-        { day: 19, price: 0.028 },
-        { day: 20, price: 0.027 },
-        { day: 21, price: 0.028 },
-        { day: 22, price: 0.029 },
-        { day: 23, price: 0.028 },
-        { day: 24, price: 0.027 },
-        { day: 25, price: 0.028 },
-        { day: 26, price: 0.029 },
-        { day: 27, price: 0.028 },
-        { day: 28, price: 0.027 },
-        { day: 29, price: 0.028 },
-        { day: 30, price: 0.028 }
-      ]
-    },
-    {
-      id: 'bedrock',
-      name: 'AWS Bedrock',
-      logo: 'https://images.unsplash.com/photo-1606868306217-dbf5046868d2?w=100&h=100&fit=crop&crop=center',
-      color: 'bg-orange-500',
-      metrics: {
-        tokenCost: 0.032,
-        latency: 420,
-        reliability: 99.9,
-        features: 85
-      },
-      costAllocation: [
-        { name: 'Compute', value: 42, color: '#F97316' },
-        { name: 'Storage', value: 30, color: '#3B82F6' },
-        { name: 'Network', value: 20, color: '#F59E0B' },
-        { name: 'Support', value: 8, color: '#EF4444' }
-      ],
-      priceHistory: [
-        { day: 1, price: 0.034 },
-        { day: 2, price: 0.033 },
-        { day: 3, price: 0.032 },
-        { day: 4, price: 0.031 },
-        { day: 5, price: 0.032 },
-        { day: 6, price: 0.033 },
-        { day: 7, price: 0.032 },
-        { day: 8, price: 0.031 },
-        { day: 9, price: 0.032 },
-        { day: 10, price: 0.033 },
-        { day: 11, price: 0.032 },
-        { day: 12, price: 0.031 },
-        { day: 13, price: 0.032 },
-        { day: 14, price: 0.033 },
-        { day: 15, price: 0.032 },
-        { day: 16, price: 0.031 },
-        { day: 17, price: 0.032 },
-        { day: 18, price: 0.033 },
-        { day: 19, price: 0.032 },
-        { day: 20, price: 0.031 },
-        { day: 21, price: 0.032 },
-        { day: 22, price: 0.033 },
-        { day: 23, price: 0.032 },
-        { day: 24, price: 0.031 },
-        { day: 25, price: 0.032 },
-        { day: 26, price: 0.033 },
-        { day: 27, price: 0.032 },
-        { day: 28, price: 0.031 },
-        { day: 29, price: 0.032 },
-        { day: 30, price: 0.032 }
-      ]
+  // Initialize workload params from dashboard data
+  useEffect(() => {
+    if (dashboardData?.originalStructuredData?.workload_params) {
+      setWorkloadParams(dashboardData.originalStructuredData.workload_params);
     }
-  ];
+  }, [dashboardData]);
 
-  const calculateROI = (provider) => {
-    const monthlyCost = (assumptions.taskFrequency * provider.metrics.tokenCost * assumptions.dataVolume) / 1000;
-    const annualCost = monthlyCost * 12;
-    const savings = Math.max(0, 50000 - annualCost); // Assuming $50k baseline
-    const roi = savings > 0 ? (savings / annualCost) * 100 : 0;
-    
-    return {
-      monthlyCost,
-      annualCost,
-      savings,
-      roi,
-      paybackMonths: savings > 0 ? Math.ceil(annualCost / (savings / 12)) : 0
-    };
+  // Get cost table from dashboard data
+  const costTable = dashboardData?.originalStructuredData?.cost_table || [];
+
+  const handleWorkloadParamsChange = (newParams) => {
+    setWorkloadParams(newParams);
+    // Here you could trigger recalculations or API calls with new parameters
   };
 
-  const handleAssumptionChange = (key, value) => {
-    setAssumptions(prev => ({
-      ...prev,
-      [key]: value
-    }));
+  const handleEstimatedSpendChange = (e) => {
+    const value = parseFloat(e.target.value) || 0;
+    setEstimatedMonthlySpend(value);
   };
 
-  const handleSaveScenario = () => {
-    const newScenario = {
-      id: Date.now(),
-      name: `Scenario ${scenarios.length + 1}`,
-      assumptions: { ...assumptions },
-      providers: providers.map(provider => ({
-        ...provider,
-        roi: calculateROI(provider)
-      })),
-      createdAt: new Date().toISOString()
-    };
-    
-    setScenarios(prev => [...prev, newScenario]);
-  };
+  if (dashboardLoading) {
+    return (
+      <div className={`flex items-center justify-center min-h-96 ${isDarkMode ? 'text-white' : ''}`}>
+        <div className="text-center">
+          <div className="w-12 h-12 bg-muted-indigo rounded-full flex items-center justify-center mx-auto mb-4">
+            <Icon name="Calculator" size={24} className="text-white animate-pulse" />
+          </div>
+          <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Loading ROI Calculator...</h3>
+          <p className={`${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>Calculating your potential savings</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleExportResults = () => {
-    const results = providers.map(provider => ({
-      provider: provider.name,
-      ...calculateROI(provider)
-    }));
-    
-    console.log('Exporting results:', results);
-  };
+  // Show message if no cost table available
+  if (!costTable || costTable.length === 0) {
+    return (
+      <div className={`p-6 min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>
+        <div className={`rounded-xl border p-8 text-center transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-black border-gray-800 shadow-2xl' 
+            : 'bg-white shadow-mist border-sky-gray'
+        }`}>
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+            isDarkMode ? 'bg-muted-indigo/20' : 'bg-muted-indigo/10'
+          }`}>
+            <Icon name="Calculator" size={24} className="text-muted-indigo" />
+          </div>
+          <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>No Cost Data Available</h3>
+          <p className={`${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>
+            Upload your data or run an AI analysis to see ROI calculations
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-
-      <main className="pt-16">
-        <div className="p-6">
-          {/* Header Section */}
-          <div className="mb-8">
-            <Breadcrumb />
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mt-4">
-              <div>
-                <h1 className="text-3xl font-bold text-text-primary font-heading">
-                  ROI Calculator
-                </h1>
-                <p className="text-text-secondary mt-2">
-                  Compare AI providers and calculate return on investment for your use cases
-                </p>
-              </div>
-              
-              <div className="flex items-center space-x-3 mt-4 lg:mt-0">
-                <button
-                  onClick={handleSaveScenario}
-                  className="flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-700 transition-colors duration-200"
-                >
-                  <Icon name="Save" size={16} />
-                  <span>Save Scenario</span>
-                </button>
-                
-                <button
-                  onClick={handleExportResults}
-                  className="flex items-center space-x-2 px-4 py-2 bg-surface text-text-primary border border-border rounded-md hover:bg-surface-700 transition-colors duration-200"
-                >
-                  <Icon name="Download" size={16} />
-                  <span>Export</span>
-                </button>
-              </div>
+    <div className={`p-6 min-h-screen space-y-6 transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>
+      {/* Header Section - Full Width */}
+      <div className={`w-full rounded-xl border p-6 transition-colors duration-300 ${
+        isDarkMode 
+          ? 'bg-black border-gray-800 shadow-2xl' 
+          : 'bg-white shadow-mist border-sky-gray'
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+              isDarkMode ? 'bg-muted-indigo/20' : 'bg-muted-indigo/10'
+            }`}>
+              <Icon name="Calculator" size={20} className="text-muted-indigo" />
+            </div>
+            <div>
+              <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>ROI Calculator</h2>
+              <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>
+                Calculate potential cost savings and return on investment for AI model optimization
+              </p>
             </div>
           </div>
-
-          <div className="flex flex-col xl:flex-row gap-6">
-            {/* Main Content Area */}
-            <div className="flex-1">
-              {/* Provider Comparison Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                {providers.map((provider) => (
-                  <ProviderCard
-                    key={provider.id}
-                    provider={provider}
-                    roi={calculateROI(provider)}
-                    assumptions={assumptions}
-                  />
-                ))}
-              </div>
-
-              {/* Scenario Comparison */}
-              <ScenarioComparison 
-                scenarios={scenarios}
-                currentAssumptions={assumptions}
-                providers={providers}
-                onScenarioSelect={(scenario) => setAssumptions(scenario.assumptions)}
-              />
-            </div>
-
-            {/* Sticky Assumption Panel */}
-            <div className="xl:w-80">
-              <AssumptionPanel
-                assumptions={assumptions}
-                onChange={handleAssumptionChange}
+          
+          {/* Estimated Monthly Spend Input */}
+          <div className="flex items-center space-x-3">
+            <label htmlFor="estimatedSpend" className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              Estimated Monthly Spend:
+            </label>
+            <div className="relative">
+              <span className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>$</span>
+              <input
+                id="estimatedSpend"
+                type="number"
+                value={estimatedMonthlySpend}
+                onChange={handleEstimatedSpendChange}
+                min="0"
+                step="100"
+                className={`pl-8 pr-4 py-2 w-40 border rounded-lg focus:ring-2 focus:ring-muted-indigo focus:border-transparent font-semibold transition-colors duration-200 ${
+                  isDarkMode 
+                    ? 'bg-black border-gray-700 text-white placeholder-gray-500' 
+                    : 'bg-white border-sky-gray text-soft-navy placeholder-slate-gray'
+                }`}
+                placeholder="5000"
               />
             </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Data Source Indicator - Full Width */}
+      {dashboardData && (
+        <div className={`w-full p-4 border rounded-lg transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-black border-gray-800 text-white' 
+            : 'bg-muted-indigo/10 border-muted-indigo/20'
+        }`}>
+          <div className="flex items-center space-x-2">
+            <Icon name="CheckCircle" size={16} className="text-muted-indigo" />
+            <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              ROI calculations based on your AI optimization analysis
+            </span>
+            <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
+              Last updated: {new Date(dashboardData.lastUpdated).toLocaleString()}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Summary Stats - Full Width */}
+      <div className={`w-full rounded-xl border p-6 transition-colors duration-300 ${
+        isDarkMode 
+          ? 'bg-black border-gray-800 shadow-2xl' 
+          : 'bg-white shadow-mist border-sky-gray'
+      }`}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-950 border-gray-800' 
+              : 'bg-cloud-white border-sky-gray'
+          }`}>
+            <div className="flex items-center space-x-2">
+              <Icon name="BarChart3" size={16} className="text-muted-indigo" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Models Analyzed</span>
+            </div>
+            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>{costTable.length}</p>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Available for comparison</p>
+          </div>
+          
+          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-950 border-gray-800' 
+              : 'bg-cloud-white border-sky-gray'
+          }`}>
+            <div className="flex items-center space-x-2">
+              <Icon name="DollarSign" size={16} className="text-calm-green" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Max Savings</span>
+            </div>
+            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              ${Math.max(...costTable.map(m => estimatedMonthlySpend - m.monthly_cost)).toLocaleString()}
+            </p>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Best case scenario</p>
+          </div>
+          
+          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-950 border-gray-800' 
+              : 'bg-cloud-white border-sky-gray'
+          }`}>
+            <div className="flex items-center space-x-2">
+              <Icon name="TrendingUp" size={16} className="text-mist-teal" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Best ROI</span>
+            </div>
+            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              {Math.max(...costTable.map(m => estimatedMonthlySpend > 0 ? ((estimatedMonthlySpend - m.monthly_cost) / estimatedMonthlySpend) * 100 : 0)).toFixed(1)}%
+            </p>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Maximum return</p>
+          </div>
+
+          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-950 border-gray-800' 
+              : 'bg-cloud-white border-sky-gray'
+          }`}>
+            <div className="flex items-center space-x-2">
+              <Icon name="Target" size={16} className="text-orange-500" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Your Budget</span>
+            </div>
+            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              ${estimatedMonthlySpend.toLocaleString()}
+            </p>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Monthly allocation</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ROI Cards Grid + Sidebar - 2/3 + 1/3 Layout */}
+      <div className="flex gap-6">
+        {/* ROI Cards Grid - 2/3 width */}
+        <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            {costTable.map((model, index) => (
+              <ROICard 
+                key={model.model_name || index}
+                model={model}
+                estimatedMonthlySpend={estimatedMonthlySpend}
+                className="h-[100%]"
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Sidebar - 1/3 width */}
+        <div className="w-80 h-100 flex-shrink-0">
+          <WorkloadParams 
+            params={workloadParams}
+            onChange={handleWorkloadParamsChange}
+            className="sticky top-6"
+            originalStructuredData={dashboardData?.originalStructuredData}
+            onApiUpdate={processStructuredData}
+          />
+        </div>
+      </div>
+
+      {/* Footer Note - Full Width */}
+      <div className={`w-full rounded-lg p-4 border transition-colors duration-300 ${
+        isDarkMode 
+          ? 'bg-gray-950 border-gray-800' 
+          : 'bg-muted-indigo/5 border-muted-indigo/20'
+      }`}>
+        <div className="flex items-start space-x-3">
+          <Icon name="Info" size={16} className="text-muted-indigo mt-0.5" />
+          <div>
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              ROI Calculation Methodology
+            </p>
+            <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
+              Savings = Your Estimated Spend - Model Monthly Cost. ROI% = (Savings / Estimated Spend) × 100. 
+              Green values indicate potential savings, red values indicate higher costs than your budget.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

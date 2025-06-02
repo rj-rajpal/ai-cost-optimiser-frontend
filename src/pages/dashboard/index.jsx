@@ -1,330 +1,217 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '../../components/ui/Header';
-import Breadcrumb from '../../components/ui/Breadcrumb';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDashboard } from '../../contexts/DashboardContext';
+import { useDarkMode } from '../../contexts/DarkModeContext';
+import { transform } from '../../lib/transform';
 import Icon from '../../components/AppIcon';
-import MetricTile from './components/MetricTile';
-import SpendChart from './components/SpendChart';
-import TopProcesses from './components/TopProcesses';
+import WorkloadParams from '../../components/WorkloadParams';
+import ModelRanking from '../../components/ModelRanking';
+import { KPI } from './components/KPI';
+import SpendVsTokensChart from './components/SpendVsTokensChart';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [chartType, setChartType] = useState('area');
-  const [timeRange, setTimeRange] = useState('30d');
+  const { projectId } = useParams();
+  const { dashboardData, isLoading: dashboardLoading, processStructuredData } = useDashboard();
+  const { isDarkMode } = useDarkMode();
+  
+  // Workload parameters state
+  const [workloadParams, setWorkloadParams] = useState({
+    calls_per_day: 1000,
+    avg_input_tokens: 150,
+    avg_output_tokens: 100,
+    latency_sla_ms: 500
+  });
 
-  // Mock data for metrics
-  const metrics = [
-    {
-      id: 'monthly-spend',
-      title: 'Monthly Spend',
-      value: '$24,567',
-      change: '+12.5%',
-      changeType: 'positive',
-      icon: 'DollarSign',
-      description: 'Total AI service costs this month'
-    },
-    {
-      id: 'token-usage',
-      title: 'Token Usage',
-      value: '2.4M',
-      change: '+8.3%',
-      changeType: 'positive',
-      icon: 'Zap',
-      description: 'Tokens consumed across all providers'
-    },
-    {
-      id: 'avg-latency',
-      title: 'Avg Latency',
-      value: '245ms',
-      change: '-5.2%',
-      changeType: 'positive',
-      icon: 'Clock',
-      description: 'Average response time across services'
-    },
-    {
-      id: 'cost-per-token',
-      title: 'Cost per 1K Tokens',
-      value: '$0.0032',
-      change: '-2.1%',
-      changeType: 'positive',
-      icon: 'TrendingDown',
-      description: 'Average cost efficiency metric'
+  // Initialize workload params from dashboard data
+  useEffect(() => {
+    if (dashboardData?.originalStructuredData?.workload_params) {
+      setWorkloadParams(dashboardData.originalStructuredData.workload_params);
     }
-  ];
+  }, [dashboardData]);
 
-  // Mock data for chart
-  const chartData = [
-    { date: '2024-01-01', spend: 18500, tokens: 1800000 },
-    { date: '2024-01-02', spend: 19200, tokens: 1920000 },
-    { date: '2024-01-03', spend: 17800, tokens: 1780000 },
-    { date: '2024-01-04', spend: 21300, tokens: 2130000 },
-    { date: '2024-01-05', spend: 22100, tokens: 2210000 },
-    { date: '2024-01-06', spend: 20500, tokens: 2050000 },
-    { date: '2024-01-07', spend: 23400, tokens: 2340000 },
-    { date: '2024-01-08', spend: 24200, tokens: 2420000 },
-    { date: '2024-01-09', spend: 22800, tokens: 2280000 },
-    { date: '2024-01-10', spend: 25100, tokens: 2510000 },
-    { date: '2024-01-11', spend: 26300, tokens: 2630000 },
-    { date: '2024-01-12', spend: 24900, tokens: 2490000 },
-    { date: '2024-01-13', spend: 27200, tokens: 2720000 },
-    { date: '2024-01-14', spend: 28100, tokens: 2810000 },
-    { date: '2024-01-15', spend: 26800, tokens: 2680000 }
-  ];
+  // Get ranked models from dashboard data
+  const rankedModels = dashboardData?.originalStructuredData?.ranked_models || [];
 
-  // Mock data for top processes
-  const topProcesses = [
-    {
-      id: 1,
-      name: 'Customer Support Automation',
-      currentCost: 45000,
-      aiCost: 12000,
-      savings: 33000,
-      roi: 275,
-      paybackMonths: 4.3,
-      status: 'high'
-    },
-    {
-      id: 2,
-      name: 'Document Processing',
-      currentCost: 32000,
-      aiCost: 8500,
-      savings: 23500,
-      roi: 276,
-      paybackMonths: 3.8,
-      status: 'high'
-    },
-    {
-      id: 3,
-      name: 'Data Entry Automation',
-      currentCost: 28000,
-      aiCost: 9200,
-      savings: 18800,
-      roi: 204,
-      paybackMonths: 5.1,
-      status: 'medium'
-    },
-    {
-      id: 4,
-      name: 'Email Classification',
-      currentCost: 18500,
-      aiCost: 4200,
-      savings: 14300,
-      roi: 340,
-      paybackMonths: 2.9,
-      status: 'high'
-    },
-    {
-      id: 5,
-      name: 'Invoice Processing',
-      currentCost: 22000,
-      aiCost: 7800,
-      savings: 14200,
-      roi: 182,
-      paybackMonths: 6.2,
-      status: 'medium'
-    }
-  ];
-
-  const handleQuickAction = (action, processId) => {
-    switch (action) {
-      case 'analyze': navigate('/process-analysis', { state: { processId } });
-        break;
-      case 'calculate': navigate('/roi-calculator', { state: { processId } });
-        break;
-      case 'scenario': navigate('/scenario-library', { state: { processId } });
-        break;
-      default:
-        console.log('Quick action:', action, processId);
-    }
+  const handleWorkloadParamsChange = (newParams) => {
+    setWorkloadParams(newParams);
+    // Here you could trigger recalculations or API calls with new parameters
   };
 
-  const timeRangeOptions = [
-    { value: '7d', label: '7 Days' },
-    { value: '30d', label: '30 Days' },
-    { value: '90d', label: '90 Days' },
-    { value: '1y', label: '1 Year' }
-  ];
+  if (dashboardLoading) {
+    return (
+      <div className={`flex items-center justify-center min-h-96 ${isDarkMode ? 'text-white' : ''}`}>
+        <div className="text-center">
+          <div className="w-12 h-12 bg-muted-indigo rounded-full flex items-center justify-center mx-auto mb-4">
+            <Icon name="BarChart3" size={24} className="text-white animate-pulse" />
+          </div>
+          <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Loading Dashboard...</h3>
+          <p className={`${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>Processing your AI cost optimization data</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no models available
+  if (!rankedModels || rankedModels.length === 0) {
+    return (
+      <div className={`p-6 min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>
+        <div className={`rounded-xl border p-8 text-center transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-black border-gray-800 shadow-2xl' 
+            : 'bg-white shadow-mist border-sky-gray'
+        }`}>
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+            isDarkMode ? 'bg-muted-indigo/20' : 'bg-muted-indigo/10'
+          }`}>
+            <Icon name="BarChart3" size={24} className="text-muted-indigo" />
+          </div>
+          <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>No Model Rankings Available</h3>
+          <p className={`${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>
+            Upload your data or run an AI analysis to see model performance rankings
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="pt-16">
-        <div className="p-6">
-          {/* Page Header */}
-          <div className="mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <Breadcrumb />
-                <h1 className="text-3xl font-bold text-text-primary mt-2">
-                  AI Cost Analytics Dashboard
-                </h1>
-                <p className="text-text-secondary mt-1">
-                  Monitor spending, track performance, and identify optimization opportunities
-                </p>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => navigate('/data-upload')}
-                  className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors duration-200 flex items-center space-x-2"
-                >
-                  <Icon name="Upload" size={16} />
-                  <span>Upload Data</span>
-                </button>
-                
-                <button
-                  onClick={() => navigate('/roi-calculator')}
-                  className="bg-surface text-text-primary border border-border px-4 py-2 rounded-md hover:bg-surface-700 transition-colors duration-200 flex items-center space-x-2"
-                >
-                  <Icon name="Calculator" size={16} />
-                  <span>Calculate ROI</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Metrics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {metrics.map((metric) => (
-              <MetricTile key={metric.id} metric={metric} />
-            ))}
-          </div>
-
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-            {/* Charts Section */}
-            <div className="xl:col-span-2">
-              <div className="bg-surface border border-border rounded-lg p-6">
-                {/* Chart Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                  <div>
-                    <h2 className="text-xl font-semibold text-text-primary">
-                      Spend vs Token Usage
-                    </h2>
-                    <p className="text-text-secondary text-sm mt-1">
-                      Track spending patterns and token consumption over time
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    {/* Chart Type Toggle */}
-                    <div className="flex bg-surface-700 rounded-md p-1">
-                      <button
-                        onClick={() => setChartType('area')}
-                        className={`px-3 py-1 text-sm rounded transition-colors duration-200 ${
-                          chartType === 'area' ?'bg-primary text-white' :'text-text-secondary hover:text-text-primary'
-                        }`}
-                      >
-                        Area
-                      </button>
-                      <button
-                        onClick={() => setChartType('bar')}
-                        className={`px-3 py-1 text-sm rounded transition-colors duration-200 ${
-                          chartType === 'bar' ?'bg-primary text-white' :'text-text-secondary hover:text-text-primary'
-                        }`}
-                      >
-                        Bar
-                      </button>
-                    </div>
-                    
-                    {/* Time Range Selector */}
-                    <select
-                      value={timeRange}
-                      onChange={(e) => setTimeRange(e.target.value)}
-                      className="bg-surface-700 border border-border text-text-primary text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                    >
-                      {timeRangeOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Chart Component */}
-                <SpendChart 
-                  data={chartData} 
-                  type={chartType} 
-                  timeRange={timeRange}
-                />
-              </div>
-            </div>
-
-            {/* Top Processes Section */}
-            <div className="xl:col-span-1">
-              <TopProcesses 
-                processes={topProcesses}
-                onQuickAction={handleQuickAction}
-              />
-            </div>
-          </div>
-
-          {/* Quick Actions Section */}
-          <div className="mt-8">
-            <div className="bg-surface border border-border rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-text-primary mb-4">
-                Quick Actions
-              </h2>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <button
-                  onClick={() => navigate('/onboarding-wizard')}
-                  className="flex items-center space-x-3 p-4 bg-surface-700 hover:bg-surface-600 rounded-lg transition-colors duration-200 group"
-                >
-                  <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center group-hover:bg-primary-700 transition-colors duration-200">
-                    <Icon name="Zap" size={20} className="text-white" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-sm font-medium text-text-primary">Setup Wizard</h3>
-                    <p className="text-xs text-text-secondary">Configure your analysis</p>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => navigate('/process-analysis')}
-                  className="flex items-center space-x-3 p-4 bg-surface-700 hover:bg-surface-600 rounded-lg transition-colors duration-200 group"
-                >
-                  <div className="w-10 h-10 bg-success-600 rounded-lg flex items-center justify-center group-hover:bg-success-700 transition-colors duration-200">
-                    <Icon name="GitBranch" size={20} className="text-white" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-sm font-medium text-text-primary">Analyze Process</h3>
-                    <p className="text-xs text-text-secondary">Evaluate automation potential</p>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => navigate('/scenario-library')}
-                  className="flex items-center space-x-3 p-4 bg-surface-700 hover:bg-surface-600 rounded-lg transition-colors duration-200 group"
-                >
-                  <div className="w-10 h-10 bg-warning-600 rounded-lg flex items-center justify-center group-hover:bg-warning-700 transition-colors duration-200">
-                    <Icon name="BookOpen" size={20} className="text-white" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-sm font-medium text-text-primary">View Scenarios</h3>
-                    <p className="text-xs text-text-secondary">Browse saved models</p>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => navigate('/data-upload')}
-                  className="flex items-center space-x-3 p-4 bg-surface-700 hover:bg-surface-600 rounded-lg transition-colors duration-200 group"
-                >
-                  <div className="w-10 h-10 bg-error-600 rounded-lg flex items-center justify-center group-hover:bg-error-700 transition-colors duration-200">
-                    <Icon name="Database" size={20} className="text-white" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-sm font-medium text-text-primary">Manage Data</h3>
-                    <p className="text-xs text-text-secondary">Upload and organize files</p>
-                  </div>
-                </button>
-              </div>
-            </div>
+    <div className={`p-6 min-h-screen space-y-6 transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>
+      {/* Data Source Indicator - Full Width */}
+      {dashboardData && (
+        <div className={`w-full p-4 border rounded-lg transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-black border-gray-800 text-white' 
+            : 'bg-muted-indigo/10 border-muted-indigo/20'
+        }`}>
+          <div className="flex items-center space-x-2">
+            <Icon name="CheckCircle" size={16} className="text-muted-indigo" />
+            <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              Model rankings generated from your AI optimization analysis
+            </span>
+            <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
+              Last updated: {new Date(dashboardData.lastUpdated).toLocaleString()}
+            </span>
           </div>
         </div>
-      </main>
+      )}
+
+      {/* Header Section - Full Width */}
+      <div className={`w-full rounded-xl border p-6 transition-colors duration-300 ${
+        isDarkMode 
+          ? 'bg-black border-gray-800 shadow-2xl' 
+          : 'bg-white shadow-mist border-sky-gray'
+      }`}>
+        <div className="flex items-center space-x-3">
+          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+            isDarkMode ? 'bg-muted-indigo/20' : 'bg-muted-indigo/10'
+          }`}>
+            <Icon name="Trophy" size={20} className="text-muted-indigo" />
+          </div>
+          <div>
+            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>AI Model Performance Wars</h2>
+            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-slate-gray'}`}>
+              AI models ranked by performance, cost, and efficiency metrics
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Stats - Full Width */}
+      <div className={`w-full rounded-xl border p-6 transition-colors duration-300 ${
+        isDarkMode 
+          ? 'bg-black border-gray-800 shadow-2xl' 
+          : 'bg-white shadow-mist border-sky-gray'
+      }`}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-950 border-gray-800' 
+              : 'bg-cloud-white border-sky-gray'
+          }`}>
+            <div className="flex items-center space-x-2">
+              <Icon name="Zap" size={16} className="text-muted-indigo" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Models Analyzed</span>
+            </div>
+            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>{rankedModels.length}</p>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Performance ranked</p>
+          </div>
+          
+          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-950 border-gray-800' 
+              : 'bg-cloud-white border-sky-gray'
+          }`}>
+            <div className="flex items-center space-x-2">
+              <Icon name="DollarSign" size={16} className="text-calm-green" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Best Cost</span>
+            </div>
+            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              ${Math.min(...rankedModels.map(m => m.monthly_cost)).toLocaleString()}
+            </p>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>Monthly savings possible</p>
+          </div>
+          
+          <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-950 border-gray-800' 
+              : 'bg-cloud-white border-sky-gray'
+          }`}>
+            <div className="flex items-center space-x-2">
+              <Icon name="Clock" size={16} className="text-mist-teal" />
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>Best Latency</span>
+            </div>
+            <p className={`text-xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              {Math.min(...rankedModels.map(m => m.p90_latency_ms))}ms
+            </p>
+            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>P90 response time</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Model Cards Grid + Sidebar - 2/3 + 1/3 Layout */}
+      <div className="flex gap-6">
+        {/* Model Cards Grid - 2/3 width */}
+        <div className="flex-1">
+          <ModelRanking 
+            rankedModels={rankedModels}
+            workloadParams={workloadParams}
+            showHeaderAndStats={false}
+            showFooter={false}
+          />
+        </div>
+
+        {/* Sidebar - 1/3 width */}
+        <div className="w-80 h-100 flex-shrink-0">
+          <WorkloadParams 
+            params={workloadParams}
+            onChange={handleWorkloadParamsChange}
+            className='h-[100%]'
+            originalStructuredData={dashboardData?.originalStructuredData}
+            onApiUpdate={processStructuredData}
+          />
+        </div>
+      </div>
+
+      {/* Footer Note - Full Width */}
+      <div className={`w-full rounded-lg p-4 border transition-colors duration-300 ${
+        isDarkMode 
+          ? 'bg-gray-950 border-gray-800' 
+          : 'bg-muted-indigo/5 border-muted-indigo/20'
+      }`}>
+        <div className="flex items-start space-x-3">
+          <Icon name="Info" size={16} className="text-muted-indigo mt-0.5" />
+          <div>
+            <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              Model Ranking Methodology
+            </p>
+            <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
+              Rankings are based on composite scores considering cost efficiency, latency performance, 
+              reliability metrics, and feature capabilities. Higher scores indicate better overall value.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

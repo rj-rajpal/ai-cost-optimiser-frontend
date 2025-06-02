@@ -1,235 +1,204 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "../../components/ui/button";
-import { Github, Mail, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 
-const Login = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-  
-  const { signInWithEmail, signInWithProvider, user } = useAuth();
+const LoginPage = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (user) {
-      navigate('/projects');
-    }
-  }, [user, navigate]);
-
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    
-    try {
-      const { error } = await signInWithEmail(email, password);
-      if (error) {
-        setError(error.message);
-      } else {
-        setMessage('Sign in successful! Redirecting...');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred');
-    } finally {
-      setLoading(false);
-    }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (error) setError(''); // Clear error when user starts typing
   };
 
-  const handleSocialLogin = async (provider) => {
-    setLoading(true);
-    setError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
     try {
-      const { error } = await signInWithProvider(provider.toLowerCase());
-      if (error) {
-        setError(error.message);
+      const result = await signIn(formData.email, formData.password);
+      
+      if (result?.error) {
+        setError(result.error.message || 'Failed to sign in');
+      } else {
+        navigate('/projects');
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Login error:', error);
       setError('An unexpected error occurred');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-cloud-white flex items-center justify-center p-4">
+    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${
+      isDarkMode ? 'bg-black' : 'bg-cloud-white'
+    }`}>
       <div className="w-full max-w-md">
-        {/* Back to Projects Link */}
-        <Link 
-          to="/projects" 
-          className="inline-flex items-center text-slate-gray hover:text-charcoal-black mb-8 transition-colors duration-200"
-        >
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Projects
-        </Link>
+        {/* Header with Dark Mode Toggle and Back Link */}
+        <div className="flex items-center justify-between mb-8">
+          {/* Back to Home Link */}
+          <Link 
+            to="/" 
+            className={`inline-flex items-center transition-colors duration-200 ${
+              isDarkMode 
+                ? 'text-gray-300 hover:text-white' 
+                : 'text-slate-gray hover:text-charcoal-black'
+            }`}
+          >
+            <ArrowLeft size={16} className="mr-2" />
+            Back to Home
+          </Link>
+
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className={`p-2 transition-colors duration-200 rounded-lg ${
+              isDarkMode 
+                ? 'text-yellow-400 hover:text-yellow-300 hover:bg-gray-900' 
+                : 'text-slate-gray hover:text-charcoal-black hover:bg-fog-gray'
+            }`}
+            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+        </div>
 
         {/* Login Card */}
-        <div className="bg-white border border-sky-gray rounded-lg p-8 shadow-mist">
+        <div className={`rounded-lg p-8 transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-black border border-gray-800 shadow-2xl' 
+            : 'bg-white border border-sky-gray shadow-mist'
+        }`}>
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-12 h-12 bg-muted-indigo rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg
-                viewBox="0 0 24 24"
-                className="w-6 h-6 text-white"
-                fill="currentColor"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
+              <span className="text-white font-bold text-lg">AI</span>
             </div>
-            <h1 className="text-2xl font-bold text-charcoal-black">Welcome Back</h1>
-            <p className="text-slate-gray mt-2">
-              Sign in to your AI Cost Optimizer account
+            <h1 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-soft-navy'}`}>
+              Welcome back
+            </h1>
+            <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
+              Sign in to your account to continue
             </p>
           </div>
 
-          {/* Error/Success Messages */}
+          {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-soft-rose border border-red-300 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
-          
-          {message && (
-            <div className="mb-4 p-3 bg-calm-green border border-green-300 rounded-lg">
-              <p className="text-green-700 text-sm">{message}</p>
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
 
-          {/* Social Login Buttons */}
-          <div className="flex gap-3 mb-6">
-            <Button 
-              variant="outline" 
-              className="flex-1 bg-white border-sky-gray hover:bg-fog-gray text-charcoal-black"
-              onClick={() => handleSocialLogin('Google')}
-              disabled={loading}
-            >
-              <Mail className="mr-2 text-[#EA4335]" size={16} aria-hidden="true" />
-              Google
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="flex-1 bg-white border-sky-gray hover:bg-fog-gray text-charcoal-black"
-              onClick={() => handleSocialLogin('Github')}
-              disabled={loading}
-            >
-              <Github className="mr-2 text-charcoal-black" size={16} aria-hidden="true" />
-              GitHub
-            </Button>
-          </div>
-
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-sky-gray"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-slate-gray">Or continue with email</span>
-            </div>
-          </div>
-
-          {/* Email Login Form */}
-          <form onSubmit={handleEmailLogin} className="space-y-4">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Field */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-charcoal-black mb-2">
-                Full Name
+              <label 
+                htmlFor="email" 
+                className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-charcoal-black'}`}
+              >
+                Email address
               </label>
               <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
-                className="w-full px-3 py-2 bg-cloud-white border border-sky-gray rounded-lg text-charcoal-black placeholder-slate-gray focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo transition-colors duration-200"
-                disabled={loading}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-charcoal-black mb-2">
-                Email
-              </label>
-              <input
-                id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 border rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo ${
+                  isDarkMode 
+                    ? 'bg-black border-gray-700 text-white placeholder-gray-500' 
+                    : 'bg-white border-sky-gray text-charcoal-black placeholder-slate-gray'
+                }`}
                 placeholder="Enter your email"
-                className="w-full px-3 py-2 bg-cloud-white border border-sky-gray rounded-lg text-charcoal-black placeholder-slate-gray focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo transition-colors duration-200"
                 required
-                disabled={loading}
               />
             </div>
-            
+
+            {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-charcoal-black mb-2">
+              <label 
+                htmlFor="password" 
+                className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-charcoal-black'}`}
+              >
                 Password
               </label>
               <div className="relative">
                 <input
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 pr-12 border rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo ${
+                    isDarkMode 
+                      ? 'bg-black border-gray-700 text-white placeholder-gray-500' 
+                      : 'bg-white border-sky-gray text-charcoal-black placeholder-slate-gray'
+                  }`}
                   placeholder="Enter your password"
-                  className="w-full px-3 py-2 bg-cloud-white border border-sky-gray rounded-lg text-charcoal-black placeholder-slate-gray focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo transition-colors duration-200 pr-10"
                   required
-                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-gray hover:text-charcoal-black transition-colors duration-200"
-                  disabled={loading}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors duration-200 ${
+                    isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-slate-gray hover:text-charcoal-black'
+                  }`}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-muted-indigo focus:ring-muted-indigo border-sky-gray rounded"
-                  disabled={loading}
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-gray">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <Link
-                  to="/forgot-password"
-                  className="text-muted-indigo hover:text-muted-indigo/80 transition-colors duration-200"
-                >
-                  Forgot password?
-                </Link>
-              </div>
+            {/* Forgot Password */}
+            <div className="text-right">
+              <Link 
+                to="/forgot-password" 
+                className="text-muted-indigo hover:text-muted-indigo/80 text-sm transition-colors duration-200"
+              >
+                Forgot your password?
+              </Link>
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full bg-muted-indigo hover:bg-muted-indigo/90 text-white" 
-              disabled={loading || !email || !password}
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`w-full bg-muted-indigo hover:bg-muted-indigo/90 text-white py-3 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
+              {isLoading ? 'Signing in...' : 'Sign in'}
+            </button>
           </form>
 
           {/* Sign Up Link */}
-          <div className="text-center mt-6">
-            <p className="text-slate-gray">
+          <div className="mt-8 text-center">
+            <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-gray'}`}>
               Don't have an account?{' '}
               <Link 
                 to="/signup" 
@@ -240,23 +209,9 @@ const Login = () => {
             </p>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-slate-gray text-sm">
-            By signing in, you agree to our{' '}
-            <Link to="/terms" className="text-muted-indigo hover:text-muted-indigo/80 transition-colors duration-200">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link to="/privacy" className="text-muted-indigo hover:text-muted-indigo/80 transition-colors duration-200">
-              Privacy Policy
-            </Link>
-          </p>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Login; 
+export default LoginPage; 

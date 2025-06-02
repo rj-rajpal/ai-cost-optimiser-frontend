@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/ui/Header';
-import Breadcrumb from '../../components/ui/Breadcrumb';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import { useToast, ToastContainer } from '../../components/ui/Toast';
@@ -14,166 +12,161 @@ const ScenarioLibrary = () => {
   const [filterProvider, setFilterProvider] = useState('all');
   const [filterSavings, setFilterSavings] = useState('all');
   const [filterDate, setFilterDate] = useState('all');
-  const [sortBy, setSortBy] = useState('created');
+  const [sortBy, setSortBy] = useState('created_desc');
   const [viewMode, setViewMode] = useState('grid');
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [scenarioToDelete, setScenarioToDelete] = useState(null);
 
-  // Mock scenario data
+  // Mock data for scenarios
   const scenarios = [
     {
       id: 1,
-      name: "Customer Service Automation",
-      description: "Automated customer support with AI chatbots and ticket routing system for improved response times and cost reduction.",
-      provider: "OpenAI",
-      totalSavings: 245000,
-      monthlySavings: 20417,
-      createdDate: "2024-01-15",
-      lastModified: "2024-01-20",
-      status: "active",
-      tags: ["customer-service", "automation", "chatbot"],
-      thumbnail: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop",
+      name: 'Manufacturing Process Optimization',
+      description: 'Automation opportunities in assembly line operations with focus on quality control and efficiency improvements.',
+      provider: 'OpenAI',
       processes: 12,
-      roi: 340,
+      potentialSavings: 250000,
+      roi: 180,
       paybackMonths: 8,
-      confidence: 85
+      confidence: 87,
+      tags: ['Manufacturing', 'Automation', 'Quality Control'],
+      createdAt: new Date('2024-01-15'),
+      updatedAt: new Date('2024-01-20'),
+      thumbnail: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=300&h=200&fit=crop&crop=center',
+      complexity: 'Medium',
+      status: 'Active'
     },
     {
       id: 2,
-      name: "Document Processing Pipeline",
-      description: "AI-powered document analysis and data extraction system for invoice processing and contract management workflows.",
-      provider: "Anthropic",
-      totalSavings: 180000,
-      monthlySavings: 15000,
-      createdDate: "2024-01-10",
-      lastModified: "2024-01-18",
-      status: "draft",
-      tags: ["document-processing", "ocr", "automation"],
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop",
+      name: 'Customer Service Enhancement',
+      description: 'AI-powered customer support automation to reduce response times and improve satisfaction scores.',
+      provider: 'Anthropic',
       processes: 8,
-      roi: 280,
-      paybackMonths: 10,
-      confidence: 78
+      potentialSavings: 180000,
+      roi: 220,
+      paybackMonths: 6,
+      confidence: 92,
+      tags: ['Customer Service', 'AI', 'Support'],
+      createdAt: new Date('2024-01-10'),
+      updatedAt: new Date('2024-01-18'),
+      thumbnail: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=300&h=200&fit=crop&crop=center',
+      complexity: 'Low',
+      status: 'Active'
     },
     {
       id: 3,
-      name: "Sales Lead Qualification",
-      description: "Intelligent lead scoring and qualification system using machine learning to prioritize high-value prospects and optimize sales team efficiency.",
-      provider: "Gemini",
-      totalSavings: 320000,
-      monthlySavings: 26667,
-      createdDate: "2024-01-08",
-      lastModified: "2024-01-22",
-      status: "active",
-      tags: ["sales", "lead-scoring", "crm"],
-      thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
+      name: 'Financial Data Analysis',
+      description: 'Automated financial reporting and anomaly detection for faster decision making and risk management.',
+      provider: 'Google',
       processes: 15,
-      roi: 420,
-      paybackMonths: 6,
-      confidence: 92
+      potentialSavings: 350000,
+      roi: 165,
+      paybackMonths: 10,
+      confidence: 78,
+      tags: ['Finance', 'Analytics', 'Risk Management'],
+      createdAt: new Date('2024-01-05'),
+      updatedAt: new Date('2024-01-15'),
+      thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop&crop=center',
+      complexity: 'High',
+      status: 'Draft'
     },
     {
       id: 4,
-      name: "Inventory Optimization",
-      description: "Predictive inventory management system using AI to forecast demand, optimize stock levels, and reduce carrying costs across multiple warehouses.",
-      provider: "Bedrock",
-      totalSavings: 150000,
-      monthlySavings: 12500,
-      createdDate: "2024-01-05",
-      lastModified: "2024-01-15",
-      status: "archived",
-      tags: ["inventory", "forecasting", "supply-chain"],
-      thumbnail: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop",
-      processes: 6,
-      roi: 200,
-      paybackMonths: 12,
-      confidence: 70
+      name: 'Supply Chain Optimization',
+      description: 'End-to-end supply chain automation including inventory management and demand forecasting.',
+      provider: 'AWS',
+      processes: 20,
+      potentialSavings: 420000,
+      roi: 195,
+      paybackMonths: 9,
+      confidence: 85,
+      tags: ['Supply Chain', 'Inventory', 'Forecasting'],
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-12'),
+      thumbnail: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=300&h=200&fit=crop&crop=center',
+      complexity: 'High',
+      status: 'Active'
     },
     {
       id: 5,
-      name: "HR Recruitment Automation",
-      description: "AI-driven candidate screening and interview scheduling system to streamline recruitment processes and improve hiring quality.",
-      provider: "OpenAI",
-      totalSavings: 95000,
-      monthlySavings: 7917,
-      createdDate: "2024-01-03",
-      lastModified: "2024-01-12",
-      status: "active",
-      tags: ["hr", "recruitment", "screening"],
-      thumbnail: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&h=300&fit=crop",
-      processes: 4,
-      roi: 180,
-      paybackMonths: 14,
-      confidence: 65
+      name: 'HR Process Automation',
+      description: 'Streamline recruitment, onboarding, and employee management processes using AI assistance.',
+      provider: 'OpenAI',
+      processes: 6,
+      potentialSavings: 95000,
+      roi: 140,
+      paybackMonths: 12,
+      confidence: 81,
+      tags: ['HR', 'Recruitment', 'Onboarding'],
+      createdAt: new Date('2023-12-28'),
+      updatedAt: new Date('2024-01-08'),
+      thumbnail: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=200&fit=crop&crop=center',
+      complexity: 'Medium',
+      status: 'Active'
     },
     {
       id: 6,
-      name: "Financial Risk Assessment",
-      description: "Automated credit risk evaluation and fraud detection system for loan applications and transaction monitoring with real-time alerts.",
-      provider: "Anthropic",
-      totalSavings: 410000,
-      monthlySavings: 34167,
-      createdDate: "2023-12-28",
-      lastModified: "2024-01-25",
-      status: "active",
-      tags: ["finance", "risk-assessment", "fraud-detection"],
-      thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop",
-      processes: 18,
-      roi: 520,
-      paybackMonths: 5,
-      confidence: 88
+      name: 'Content Marketing Automation',
+      description: 'AI-driven content creation and social media management for improved marketing efficiency.',
+      provider: 'Anthropic',
+      processes: 10,
+      potentialSavings: 125000,
+      roi: 175,
+      paybackMonths: 7,
+      confidence: 89,
+      tags: ['Marketing', 'Content', 'Social Media'],
+      createdAt: new Date('2023-12-20'),
+      updatedAt: new Date('2024-01-05'),
+      thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop&crop=center',
+      complexity: 'Low',
+      status: 'Active'
     }
   ];
 
-  const templateOptions = [
-    {
-      id: 'customer-service',
-      name: 'Customer Service',
-      description: 'AI chatbots and support automation',
-      icon: 'MessageCircle',
-      processes: ['Ticket routing', 'FAQ responses', 'Escalation management']
-    },
-    {
-      id: 'document-processing',
-      name: 'Document Processing',
-      description: 'OCR and data extraction workflows',
-      icon: 'FileText',
-      processes: ['Invoice processing', 'Contract analysis', 'Form digitization']
-    },
-    {
-      id: 'sales-automation',
-      name: 'Sales Automation',
-      description: 'Lead scoring and CRM optimization',
-      icon: 'TrendingUp',
-      processes: ['Lead qualification', 'Pipeline management', 'Proposal generation']
-    },
-    {
-      id: 'hr-automation',
-      name: 'HR Automation',
-      description: 'Recruitment and employee management',
-      icon: 'Users',
-      processes: ['Resume screening', 'Interview scheduling', 'Onboarding']
-    }
-  ];
-
-  const getProviderColor = (provider) => {
-    const colors = {
-      'OpenAI': 'bg-green-500',
-      'Anthropic': 'bg-orange-500',
-      'Gemini': 'bg-blue-500',
-      'Bedrock': 'bg-purple-500'
-    };
-    return colors[provider] || 'bg-gray-500';
-  };
-
-  const getStatusColor = (status) => {
-    const colors = {
-      'active': 'bg-success text-white',
-      'draft': 'bg-warning text-white',
-      'archived': 'bg-secondary-400 text-white'
-    };
-    return colors[status] || 'bg-gray-500 text-white';
-  };
+  // Filtered and sorted scenarios
+  const filteredAndSortedScenarios = scenarios
+    .filter(scenario => {
+      const matchesSearch = scenario.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           scenario.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           scenario.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesProvider = filterProvider === 'all' || scenario.provider === filterProvider;
+      
+      const matchesSavings = filterSavings === 'all' || 
+        (filterSavings === 'low' && scenario.potentialSavings < 150000) ||
+        (filterSavings === 'medium' && scenario.potentialSavings >= 150000 && scenario.potentialSavings < 300000) ||
+        (filterSavings === 'high' && scenario.potentialSavings >= 300000);
+      
+      const matchesDate = filterDate === 'all' ||
+        (filterDate === 'week' && scenario.createdAt >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
+        (filterDate === 'month' && scenario.createdAt >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) ||
+        (filterDate === 'quarter' && scenario.createdAt >= new Date(Date.now() - 90 * 24 * 60 * 60 * 1000));
+      
+      return matchesSearch && matchesProvider && matchesSavings && matchesDate;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'name_asc':
+          return a.name.localeCompare(b.name);
+        case 'name_desc':
+          return b.name.localeCompare(a.name);
+        case 'savings_asc':
+          return a.potentialSavings - b.potentialSavings;
+        case 'savings_desc':
+          return b.potentialSavings - a.potentialSavings;
+        case 'roi_asc':
+          return a.roi - b.roi;
+        case 'roi_desc':
+          return b.roi - a.roi;
+        case 'created_asc':
+          return a.createdAt - b.createdAt;
+        case 'created_desc':
+          return b.createdAt - a.createdAt;
+        default:
+          return 0;
+      }
+    });
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -184,361 +177,334 @@ const ScenarioLibrary = () => {
     }).format(amount);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric'
     });
   };
 
-  const filteredScenarios = scenarios.filter(scenario => {
-    const matchesSearch = scenario.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         scenario.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         scenario.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesProvider = filterProvider === 'all' || scenario.provider === filterProvider;
-    
-    const matchesSavings = filterSavings === 'all' || 
-                          (filterSavings === 'high' && scenario.totalSavings >= 300000) ||
-                          (filterSavings === 'medium' && scenario.totalSavings >= 150000 && scenario.totalSavings < 300000) ||
-                          (filterSavings === 'low' && scenario.totalSavings < 150000);
-    
-    const matchesDate = filterDate === 'all' ||
-                       (filterDate === 'recent' && new Date(scenario.createdDate) > new Date('2024-01-01')) ||
-                       (filterDate === 'older' && new Date(scenario.createdDate) <= new Date('2024-01-01'));
-
-    return matchesSearch && matchesProvider && matchesSavings && matchesDate;
-  });
-
-  const sortedScenarios = [...filteredScenarios].sort((a, b) => {
-    switch (sortBy) {
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'savings':
-        return b.totalSavings - a.totalSavings;
-      case 'created':
-        return new Date(b.createdDate) - new Date(a.createdDate);
-      case 'modified':
-        return new Date(b.lastModified) - new Date(a.lastModified);
-      default:
-        return 0;
-    }
-  });
-
   const handleScenarioSelect = (scenarioId) => {
-    setSelectedScenarios(prev => 
-      prev.includes(scenarioId) 
-        ? prev.filter(id => id !== scenarioId)
-        : [...prev, scenarioId]
-    );
+    setSelectedScenarios(prev => {
+      if (prev.includes(scenarioId)) {
+        return prev.filter(id => id !== scenarioId);
+      } else {
+        return [...prev, scenarioId];
+      }
+    });
   };
 
   const handleSelectAll = () => {
-    if (selectedScenarios.length === sortedScenarios.length) {
+    if (selectedScenarios.length === filteredAndSortedScenarios.length) {
       setSelectedScenarios([]);
     } else {
-      setSelectedScenarios(sortedScenarios.map(s => s.id));
+      setSelectedScenarios(filteredAndSortedScenarios.map(s => s.id));
     }
   };
 
-  const handleBulkAction = (action) => {
-    if (selectedScenarios.length === 0) {
-      showWarning('No Selection', 'Please select scenarios to perform bulk actions.');
-      return;
-    }
-
-    switch (action) {
-      case 'duplicate': showSuccess('Scenarios Duplicated', `${selectedScenarios.length} scenarios have been duplicated.`);
-        break;
-      case 'export':
-        showSuccess('Export Started', `Exporting ${selectedScenarios.length} scenarios to CSV.`);
-        break;
-      case 'delete':
-        setShowDeleteDialog(true);
-        break;
-      default:
-        break;
+  const handleDeleteSelected = () => {
+    if (selectedScenarios.length === 0) return;
+    
+    if (selectedScenarios.length === 1) {
+      const scenario = scenarios.find(s => s.id === selectedScenarios[0]);
+      setScenarioToDelete(scenario);
+      setShowDeleteDialog(true);
+    } else {
+      showWarning(`Delete ${selectedScenarios.length} scenarios?`, 'This action cannot be undone.');
     }
   };
 
-  const handleDeleteConfirm = () => {
-    showSuccess('Scenarios Deleted', `${selectedScenarios.length} scenarios have been deleted.`);
+  const confirmDelete = () => {
+    showSuccess('Scenarios deleted successfully');
     setSelectedScenarios([]);
     setShowDeleteDialog(false);
+    setScenarioToDelete(null);
   };
 
-  const handleScenarioAction = (scenarioId, action) => {
-    const scenario = scenarios.find(s => s.id === scenarioId);
+  const handleDuplicateScenario = (scenario) => {
+    showSuccess(`"${scenario.name}" duplicated successfully`);
+  };
+
+  const handleExportSelected = () => {
+    if (selectedScenarios.length === 0) {
+      showWarning('No scenarios selected', 'Please select scenarios to export.');
+      return;
+    }
     
-    switch (action) {
-      case 'edit': navigate('/roi-calculator', { state: { scenarioId } });
-        break;
-      case 'duplicate': showSuccess('Scenario Duplicated', `"${scenario.name}" has been duplicated.`);
-        break;
-      case 'share': showSuccess('Share Link Copied', 'Scenario share link copied to clipboard.');
-        break;
-      case 'archive': showSuccess('Scenario Archived', `"${scenario.name}" has been archived.`);
-        break;
-      case 'delete':
-        showSuccess('Scenario Deleted', `"${scenario.name}" has been deleted.`);
-        break;
+    showSuccess(`Exported ${selectedScenarios.length} scenario${selectedScenarios.length > 1 ? 's' : ''}`);
+  };
+
+  const getComplexityColor = (complexity) => {
+    switch (complexity) {
+      case 'Low':
+        return 'bg-mist-teal/10 text-mist-teal border-mist-teal';
+      case 'Medium':
+        return 'bg-soft-amber/10 text-soft-amber border-soft-amber';
+      case 'High':
+        return 'bg-soft-rose/10 text-soft-rose border-soft-rose';
       default:
-        break;
+        return 'bg-fog-gray text-slate-gray border-sky-gray';
     }
   };
 
-  const handleCreateFromTemplate = (templateId) => {
-    const template = templateOptions.find(t => t.id === templateId);
-    showSuccess('Template Selected', `Creating new scenario from "${template.name}" template.`);
-    setShowCreateDialog(false);
-    navigate('/roi-calculator', { state: { templateId } });
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Active':
+        return 'bg-mist-teal/10 text-mist-teal border-mist-teal';
+      case 'Draft':
+        return 'bg-soft-amber/10 text-soft-amber border-soft-amber';
+      case 'Archived':
+        return 'bg-slate-gray/10 text-slate-gray border-slate-gray';
+      default:
+        return 'bg-fog-gray text-slate-gray border-sky-gray';
+    }
+  };
+
+  const getProviderColor = (provider) => {
+    switch (provider) {
+      case 'OpenAI':
+        return 'bg-green-100 text-green-800';
+      case 'Anthropic':
+        return 'bg-blue-100 text-blue-800';
+      case 'Google':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'AWS':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-fog-gray text-slate-gray';
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="pt-16">
-        <div className="p-6">
-          {/* Page Header */}
-          <div className="mb-8">
-            <Breadcrumb />
-            <div className="mt-4 flex flex-col lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-text-primary font-heading">
-                  Scenario Library
-                </h1>
-                <p className="mt-2 text-text-secondary">
-                  Manage and organize your cost optimization scenarios
-                </p>
-              </div>
-              <div className="mt-4 lg:mt-0 flex items-center space-x-3">
+    <div className="bg-cloud-white">
+      {/* Search and Filters */}
+      <div className="bg-white border border-sky-gray rounded-lg p-6 mb-6 shadow-mist">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          {/* Search */}
+          <div className="flex-1 max-w-md">
+            <div className="relative">
+              <Icon name="Search" size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-gray" />
+              <input
+                type="text"
+                placeholder="Search scenarios..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-sky-gray rounded-md focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo"
+              />
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="flex items-center space-x-4">
+            <select
+              value={filterProvider}
+              onChange={(e) => setFilterProvider(e.target.value)}
+              className="px-3 py-2 border border-sky-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo"
+            >
+              <option value="all">All Providers</option>
+              <option value="OpenAI">OpenAI</option>
+              <option value="Anthropic">Anthropic</option>
+              <option value="Google">Google</option>
+              <option value="AWS">AWS</option>
+            </select>
+
+            <select
+              value={filterSavings}
+              onChange={(e) => setFilterSavings(e.target.value)}
+              className="px-3 py-2 border border-sky-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo"
+            >
+              <option value="all">All Savings</option>
+              <option value="low">Under $150K</option>
+              <option value="medium">$150K - $300K</option>
+              <option value="high">Over $300K</option>
+            </select>
+
+            <select
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className="px-3 py-2 border border-sky-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo"
+            >
+              <option value="all">All Time</option>
+              <option value="week">Last Week</option>
+              <option value="month">Last Month</option>
+              <option value="quarter">Last Quarter</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex items-center justify-between mt-6 pt-6 border-t border-sky-gray">
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-slate-gray">
+              {filteredAndSortedScenarios.length} scenario{filteredAndSortedScenarios.length !== 1 ? 's' : ''}
+              {selectedScenarios.length > 0 && ` (${selectedScenarios.length} selected)`}
+            </span>
+
+            {selectedScenarios.length > 0 && (
+              <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => setShowCreateDialog(true)}
-                  className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors duration-200 flex items-center space-x-2"
+                  onClick={handleExportSelected}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm text-muted-indigo hover:text-soft-navy transition-colors duration-200"
                 >
-                  <Icon name="Plus" size={20} />
-                  <span>New Scenario</span>
+                  <Icon name="Download" size={14} />
+                  <span>Export</span>
+                </button>
+                <button
+                  onClick={handleDeleteSelected}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm text-soft-rose hover:text-red-600 transition-colors duration-200"
+                >
+                  <Icon name="Trash2" size={14} />
+                  <span>Delete</span>
                 </button>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Filters and Search */}
-          <div className="bg-surface border border-border rounded-lg p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-4">
-              {/* Search */}
-              <div className="md:col-span-2">
-                <div className="relative">
-                  <Icon name="Search" size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary" />
-                  <input
-                    type="text"
-                    placeholder="Search scenarios..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-surface-700 border border-border rounded-md text-text-primary placeholder-text-tertiary focus:border-primary focus:ring-1 focus:ring-primary transition-colors duration-200"
-                  />
-                </div>
-              </div>
+          <div className="flex items-center space-x-4">
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2 border border-sky-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo"
+            >
+              <option value="created_desc">Newest First</option>
+              <option value="created_asc">Oldest First</option>
+              <option value="name_asc">Name A-Z</option>
+              <option value="name_desc">Name Z-A</option>
+              <option value="savings_desc">Highest Savings</option>
+              <option value="savings_asc">Lowest Savings</option>
+              <option value="roi_desc">Highest ROI</option>
+              <option value="roi_asc">Lowest ROI</option>
+            </select>
 
-              {/* Provider Filter */}
-              <div>
-                <select
-                  value={filterProvider}
-                  onChange={(e) => setFilterProvider(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-700 border border-border rounded-md text-text-primary focus:border-primary focus:ring-1 focus:ring-primary transition-colors duration-200"
-                >
-                  <option value="all">All Providers</option>
-                  <option value="OpenAI">OpenAI</option>
-                  <option value="Anthropic">Anthropic</option>
-                  <option value="Gemini">Gemini</option>
-                  <option value="Bedrock">Bedrock</option>
-                </select>
-              </div>
-
-              {/* Savings Filter */}
-              <div>
-                <select
-                  value={filterSavings}
-                  onChange={(e) => setFilterSavings(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-700 border border-border rounded-md text-text-primary focus:border-primary focus:ring-1 focus:ring-primary transition-colors duration-200"
-                >
-                  <option value="all">All Savings</option>
-                  <option value="high">High (&gt;$300K)</option>
-                  <option value="medium">Medium ($150K-$300K)</option>
-                  <option value="low">Low (&lt;$150K)</option>
-                </select>
-              </div>
-
-              {/* Date Filter */}
-              <div>
-                <select
-                  value={filterDate}
-                  onChange={(e) => setFilterDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-700 border border-border rounded-md text-text-primary focus:border-primary focus:ring-1 focus:ring-primary transition-colors duration-200"
-                >
-                  <option value="all">All Dates</option>
-                  <option value="recent">Recent (2024)</option>
-                  <option value="older">Older</option>
-                </select>
-              </div>
-
-              {/* Sort */}
-              <div>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-700 border border-border rounded-md text-text-primary focus:border-primary focus:ring-1 focus:ring-primary transition-colors duration-200"
-                >
-                  <option value="created">Created Date</option>
-                  <option value="modified">Last Modified</option>
-                  <option value="name">Name</option>
-                  <option value="savings">Total Savings</option>
-                </select>
-              </div>
+            {/* View Mode Toggle */}
+            <div className="flex bg-fog-gray rounded-md p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded transition-colors duration-200 ${
+                  viewMode === 'grid' ? 'bg-white text-soft-navy shadow-sm' : 'text-slate-gray hover:text-soft-navy'
+                }`}
+              >
+                <Icon name="Grid3X3" size={16} />
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`p-2 rounded transition-colors duration-200 ${
+                  viewMode === 'table' ? 'bg-white text-soft-navy shadow-sm' : 'text-slate-gray hover:text-soft-navy'
+                }`}
+              >
+                <Icon name="List" size={16} />
+              </button>
             </div>
 
-            {/* Bulk Actions */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedScenarios.length === sortedScenarios.length && sortedScenarios.length > 0}
-                    onChange={handleSelectAll}
-                    className="rounded border-border text-primary focus:ring-primary"
-                  />
-                  <span className="text-sm text-text-secondary">
-                    Select All ({selectedScenarios.length} selected)
-                  </span>
-                </label>
-
-                {selectedScenarios.length > 0 && (
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleBulkAction('duplicate')}
-                      className="px-3 py-1 text-sm bg-surface-700 text-text-primary border border-border rounded hover:bg-surface-600 transition-colors duration-200"
-                    >
-                      Duplicate
-                    </button>
-                    <button
-                      onClick={() => handleBulkAction('export')}
-                      className="px-3 py-1 text-sm bg-surface-700 text-text-primary border border-border rounded hover:bg-surface-600 transition-colors duration-200"
-                    >
-                      Export
-                    </button>
-                    <button
-                      onClick={() => handleBulkAction('delete')}
-                      className="px-3 py-1 text-sm bg-error text-white rounded hover:bg-error-600 transition-colors duration-200"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-4 sm:mt-0 flex items-center space-x-2">
-                <span className="text-sm text-text-secondary">
-                  {sortedScenarios.length} scenarios
-                </span>
-                <div className="flex items-center border border-border rounded">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2 ${viewMode === 'grid' ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'} transition-colors duration-200`}
-                  >
-                    <Icon name="Grid3X3" size={16} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-2 ${viewMode === 'list' ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'} transition-colors duration-200`}
-                  >
-                    <Icon name="List" size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
+            {/* Create Button */}
+            <button
+              onClick={() => setShowCreateDialog(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-muted-indigo text-white rounded-md hover:bg-soft-navy transition-colors duration-200"
+            >
+              <Icon name="Plus" size={16} />
+              <span>Create Scenario</span>
+            </button>
           </div>
+        </div>
+      </div>
 
-          {/* Scenarios Grid/List */}
-          {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sortedScenarios.map((scenario) => (
+      {/* Content */}
+      {filteredAndSortedScenarios.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-24 h-24 mx-auto bg-fog-gray rounded-full flex items-center justify-center mb-6">
+            <Icon name="FolderOpen" size={48} className="text-slate-gray" />
+          </div>
+          <h3 className="text-xl font-semibold text-soft-navy mb-2">
+            No scenarios found
+          </h3>
+          <p className="text-slate-gray mb-6">
+            {searchQuery || filterProvider !== 'all' || filterSavings !== 'all' || filterDate !== 'all'
+              ? 'Try adjusting your search criteria or filters.'
+              : 'Get started by creating your first optimization scenario.'}
+          </p>
+          <button
+            onClick={() => setShowCreateDialog(true)}
+            className="inline-flex items-center space-x-2 px-6 py-3 bg-muted-indigo text-white rounded-md hover:bg-soft-navy transition-colors duration-200"
+          >
+            <Icon name="Plus" size={16} />
+            <span>Create First Scenario</span>
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Grid View */}
+          {viewMode === 'grid' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredAndSortedScenarios.map((scenario) => (
                 <div
                   key={scenario.id}
-                  className="bg-surface border border-border rounded-lg overflow-hidden hover:shadow-elevation transition-all duration-200 group"
+                  className="bg-white border border-sky-gray rounded-lg overflow-hidden hover:shadow-mist transition-all duration-200 group"
                 >
-                  {/* Thumbnail */}
-                  <div className="relative h-48 overflow-hidden">
+                  {/* Thumbnail and Selection */}
+                  <div className="relative">
                     <Image
                       src={scenario.thumbnail}
                       alt={scenario.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      className="w-full h-48 object-cover"
                     />
-                    <div className="absolute top-3 left-3 flex items-center space-x-2">
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${getProviderColor(scenario.provider)} text-white`}>
-                        {scenario.provider}
-                      </span>
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusColor(scenario.status)}`}>
-                        {scenario.status}
-                      </span>
-                    </div>
-                    <div className="absolute top-3 right-3">
+                    <div className="absolute top-3 left-3">
                       <input
                         type="checkbox"
                         checked={selectedScenarios.includes(scenario.id)}
                         onChange={() => handleScenarioSelect(scenario.id)}
-                        className="rounded border-border text-primary focus:ring-primary"
+                        className="rounded border-sky-gray text-muted-indigo focus:ring-muted-indigo"
                       />
                     </div>
-                    <div className="absolute bottom-3 right-3">
-                      <div className="bg-success text-white px-2 py-1 rounded text-sm font-medium">
-                        {formatCurrency(scenario.totalSavings)}
-                      </div>
+                    <div className="absolute top-3 right-3">
+                      <span className={`px-2 py-1 text-xs rounded ${getStatusColor(scenario.status)}`}>
+                        {scenario.status}
+                      </span>
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-text-primary mb-2 line-clamp-1">
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-soft-navy mb-2 line-clamp-1">
                       {scenario.name}
                     </h3>
-                    <p className="text-sm text-text-secondary mb-4 line-clamp-2">
+                    <p className="text-sm text-slate-gray mb-4 line-clamp-2">
                       {scenario.description}
                     </p>
 
-                    {/* Stats */}
+                    {/* Metrics Grid */}
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
-                        <p className="text-xs text-text-tertiary">Processes</p>
-                        <p className="text-sm font-medium text-text-primary">{scenario.processes}</p>
+                        <p className="text-xs text-slate-gray">Processes</p>
+                        <p className="text-sm font-medium text-soft-navy">{scenario.processes}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-text-tertiary">ROI</p>
-                        <p className="text-sm font-medium text-text-primary">{scenario.roi}%</p>
+                        <p className="text-xs text-slate-gray">ROI</p>
+                        <p className="text-sm font-medium text-soft-navy">{scenario.roi}%</p>
                       </div>
                       <div>
-                        <p className="text-xs text-text-tertiary">Payback</p>
-                        <p className="text-sm font-medium text-text-primary">{scenario.paybackMonths} months</p>
+                        <p className="text-xs text-slate-gray">Payback</p>
+                        <p className="text-sm font-medium text-soft-navy">{scenario.paybackMonths} months</p>
                       </div>
                       <div>
-                        <p className="text-xs text-text-tertiary">Confidence</p>
-                        <p className="text-sm font-medium text-text-primary">{scenario.confidence}%</p>
+                        <p className="text-xs text-slate-gray">Confidence</p>
+                        <p className="text-sm font-medium text-soft-navy">{scenario.confidence}%</p>
                       </div>
                     </div>
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1 mb-4">
-                      {scenario.tags.slice(0, 2).map((tag) => (
+                      {scenario.tags.slice(0, 2).map((tag, index) => (
                         <span
-                          key={tag}
-                          className="px-2 py-1 text-xs bg-surface-700 text-text-secondary rounded"
+                          key={index}
+                          className="px-2 py-1 text-xs bg-fog-gray text-slate-gray rounded"
                         >
                           {tag}
                         </span>
                       ))}
                       {scenario.tags.length > 2 && (
-                        <span className="px-2 py-1 text-xs bg-surface-700 text-text-secondary rounded">
+                        <span className="px-2 py-1 text-xs bg-fog-gray text-slate-gray rounded">
                           +{scenario.tags.length - 2}
                         </span>
                       )}
@@ -546,45 +512,48 @@ const ScenarioLibrary = () => {
 
                     {/* Footer */}
                     <div className="flex items-center justify-between">
-                      <div className="text-xs text-text-tertiary">
-                        Created {formatDate(scenario.createdDate)}
+                      <div className="text-xs text-slate-gray">
+                        Updated {formatDate(scenario.updatedAt)}
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <button
-                          onClick={() => handleScenarioAction(scenario.id, 'edit')}
-                          className="p-1 text-text-tertiary hover:text-text-primary transition-colors duration-200"
-                          title="Edit scenario"
+                          onClick={() => handleDuplicateScenario(scenario)}
+                          className="p-1 text-slate-gray hover:text-soft-navy transition-colors duration-200"
                         >
-                          <Icon name="Edit" size={16} />
+                          <Icon name="Copy" size={14} />
                         </button>
                         <button
-                          onClick={() => handleScenarioAction(scenario.id, 'duplicate')}
-                          className="p-1 text-text-tertiary hover:text-text-primary transition-colors duration-200"
-                          title="Duplicate scenario"
+                          onClick={() => navigate(`/scenario/${scenario.id}/edit`)}
+                          className="p-1 text-slate-gray hover:text-soft-navy transition-colors duration-200"
                         >
-                          <Icon name="Copy" size={16} />
+                          <Icon name="Edit" size={14} />
                         </button>
                         <button
-                          onClick={() => handleScenarioAction(scenario.id, 'share')}
-                          className="p-1 text-text-tertiary hover:text-text-primary transition-colors duration-200"
-                          title="Share scenario"
+                          onClick={() => {
+                            setScenarioToDelete(scenario);
+                            setShowDeleteDialog(true);
+                          }}
+                          className="p-1 text-slate-gray hover:text-soft-navy transition-colors duration-200"
                         >
-                          <Icon name="Share" size={16} />
+                          <Icon name="Trash2" size={14} />
                         </button>
-                        <div className="relative group">
-                          <button className="p-1 text-text-tertiary hover:text-text-primary transition-colors duration-200">
-                            <Icon name="MoreVertical" size={16} />
+                        <div className="relative group/menu">
+                          <button className="p-1 text-slate-gray hover:text-soft-navy transition-colors duration-200">
+                            <Icon name="MoreVertical" size={14} />
                           </button>
-                          <div className="absolute right-0 top-8 w-32 bg-surface border border-border rounded-lg shadow-elevation opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                          <div className="absolute right-0 top-8 w-32 bg-white border border-sky-gray rounded-lg shadow-mist opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-200 z-10">
                             <button
-                              onClick={() => handleScenarioAction(scenario.id, 'archive')}
-                              className="w-full px-3 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-surface-700 transition-colors duration-200"
+                              onClick={() => navigate(`/scenario/${scenario.id}`)}
+                              className="w-full px-3 py-2 text-left text-sm text-slate-gray hover:text-soft-navy hover:bg-fog-gray transition-colors duration-200"
                             >
-                              Archive
+                              View Details
                             </button>
                             <button
-                              onClick={() => handleScenarioAction(scenario.id, 'delete')}
-                              className="w-full px-3 py-2 text-left text-sm text-error hover:text-error-600 hover:bg-surface-700 transition-colors duration-200"
+                              onClick={() => {
+                                setScenarioToDelete(scenario);
+                                setShowDeleteDialog(true);
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm text-soft-rose hover:text-red-600 hover:bg-fog-gray transition-colors duration-200"
                             >
                               Delete
                             </button>
@@ -596,189 +565,165 @@ const ScenarioLibrary = () => {
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="bg-surface border border-border rounded-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-surface-700 border-b border-border">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                        <input
-                          type="checkbox"
-                          checked={selectedScenarios.length === sortedScenarios.length && sortedScenarios.length > 0}
-                          onChange={handleSelectAll}
-                          className="rounded border-border text-primary focus:ring-primary"
-                        />
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                        Scenario
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                        Provider
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                        Total Savings
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                        ROI
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                        Created
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {sortedScenarios.map((scenario) => (
-                      <tr key={scenario.id} className="hover:bg-surface-700 transition-colors duration-200">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="checkbox"
-                            checked={selectedScenarios.includes(scenario.id)}
-                            onChange={() => handleScenarioSelect(scenario.id)}
-                            className="rounded border-border text-primary focus:ring-primary"
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                              <Image
-                                src={scenario.thumbnail}
-                                alt={scenario.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-text-primary">
-                                {scenario.name}
-                              </div>
-                              <div className="text-sm text-text-secondary line-clamp-1">
-                                {scenario.description}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${getProviderColor(scenario.provider)} text-white`}>
-                            {scenario.provider}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-text-primary">
-                            {formatCurrency(scenario.totalSavings)}
-                          </div>
-                          <div className="text-sm text-text-secondary">
-                            {formatCurrency(scenario.monthlySavings)}/month
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-text-primary">
-                            {scenario.roi}%
-                          </div>
-                          <div className="text-sm text-text-secondary">
-                            {scenario.paybackMonths} months
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusColor(scenario.status)}`}>
-                            {scenario.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
-                          {formatDate(scenario.createdDate)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleScenarioAction(scenario.id, 'edit')}
-                              className="p-1 text-text-tertiary hover:text-text-primary transition-colors duration-200"
-                              title="Edit scenario"
-                            >
-                              <Icon name="Edit" size={16} />
-                            </button>
-                            <button
-                              onClick={() => handleScenarioAction(scenario.id, 'duplicate')}
-                              className="p-1 text-text-tertiary hover:text-text-primary transition-colors duration-200"
-                              title="Duplicate scenario"
-                            >
-                              <Icon name="Copy" size={16} />
-                            </button>
-                            <button
-                              onClick={() => handleScenarioAction(scenario.id, 'share')}
-                              className="p-1 text-text-tertiary hover:text-text-primary transition-colors duration-200"
-                              title="Share scenario"
-                            >
-                              <Icon name="Share" size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
           )}
 
-          {/* Empty State */}
-          {sortedScenarios.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-24 h-24 mx-auto bg-surface rounded-full flex items-center justify-center mb-6">
-                <Icon name="FolderOpen" size={48} className="text-text-tertiary" />
-              </div>
-              <h3 className="text-xl font-semibold text-text-primary mb-2">
-                No scenarios found
-              </h3>
-              <p className="text-text-secondary mb-6">
-                {searchQuery || filterProvider !== 'all' || filterSavings !== 'all' || filterDate !== 'all' ?'Try adjusting your filters or search terms.' :'Create your first cost optimization scenario to get started.'}
-              </p>
-              <button
-                onClick={() => setShowCreateDialog(true)}
-                className="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary-700 transition-colors duration-200 flex items-center space-x-2 mx-auto"
-              >
-                <Icon name="Plus" size={20} />
-                <span>Create Scenario</span>
-              </button>
+          {/* Table View */}
+          {viewMode === 'table' && (
+            <div className="bg-white border border-sky-gray rounded-lg overflow-hidden shadow-mist">
+              {/* Table Header */}
+              <thead className="bg-fog-gray border-b border-sky-gray">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-gray uppercase tracking-wider">
+                    <input
+                      type="checkbox"
+                      checked={selectedScenarios.length === filteredAndSortedScenarios.length}
+                      onChange={handleSelectAll}
+                      className="rounded border-sky-gray text-muted-indigo focus:ring-muted-indigo"
+                    />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-gray uppercase tracking-wider">
+                    Scenario
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-gray uppercase tracking-wider">
+                    Provider
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-gray uppercase tracking-wider">
+                    Processes
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-gray uppercase tracking-wider">
+                    Savings
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-gray uppercase tracking-wider">
+                    ROI
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-gray uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-gray uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-sky-gray">
+                {filteredAndSortedScenarios.map((scenario) => (
+                  <tr key={scenario.id} className="hover:bg-fog-gray transition-colors duration-200">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedScenarios.includes(scenario.id)}
+                        onChange={() => handleScenarioSelect(scenario.id)}
+                        className="rounded border-sky-gray text-muted-indigo focus:ring-muted-indigo"
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <Image
+                            className="h-10 w-10 rounded-lg object-cover"
+                            src={scenario.thumbnail}
+                            alt=""
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-soft-navy">
+                            {scenario.name}
+                          </div>
+                          <div className="text-sm text-slate-gray line-clamp-1">
+                            {scenario.description}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getProviderColor(scenario.provider)}`}>
+                        {scenario.provider}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-soft-navy">
+                        {scenario.processes}
+                      </div>
+                      <div className="text-sm text-slate-gray">
+                        processes
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-soft-navy">
+                        {formatCurrency(scenario.potentialSavings)}
+                      </div>
+                      <div className="text-sm text-slate-gray">
+                        potential
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-mist-teal">
+                        {scenario.roi}%
+                      </div>
+                      <div className="text-sm text-slate-gray">
+                        {scenario.paybackMonths}m payback
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-gray">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(scenario.status)}`}>
+                        {scenario.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => navigate(`/scenario/${scenario.id}`)}
+                          className="p-1 text-slate-gray hover:text-soft-navy transition-colors duration-200"
+                        >
+                          <Icon name="Eye" size={14} />
+                        </button>
+                        <button
+                          onClick={() => navigate(`/scenario/${scenario.id}/edit`)}
+                          className="p-1 text-slate-gray hover:text-soft-navy transition-colors duration-200"
+                        >
+                          <Icon name="Edit" size={14} />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setScenarioToDelete(scenario);
+                            setShowDeleteDialog(true);
+                          }}
+                          className="p-1 text-slate-gray hover:text-soft-navy transition-colors duration-200"
+                        >
+                          <Icon name="Trash2" size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </div>
           )}
-        </div>
-      </main>
+        </>
+      )}
 
       {/* Delete Confirmation Dialog */}
       {showDeleteDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal">
-          <div className="bg-surface border border-border rounded-lg p-6 max-w-md w-full mx-4">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-error-100 rounded-full flex items-center justify-center">
-                <Icon name="AlertTriangle" size={20} className="text-error" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-text-primary">
-                  Delete Scenarios
-                </h3>
-                <p className="text-sm text-text-secondary">
-                  This action cannot be undone.
-                </p>
-              </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white border border-sky-gray rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <Icon name="AlertTriangle" size={24} className="text-soft-rose mr-3" />
+              <h3 className="text-lg font-semibold text-soft-navy">
+                Delete Scenario
+              </h3>
             </div>
-            <p className="text-text-secondary mb-6">
-              Are you sure you want to delete {selectedScenarios.length} selected scenario{selectedScenarios.length > 1 ? 's' : ''}?
+            <p className="text-slate-gray mb-6">
+              Are you sure you want to delete "{scenarioToDelete?.name}"? This action cannot be undone.
             </p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowDeleteDialog(false)}
-                className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors duration-200"
+                className="px-4 py-2 text-slate-gray hover:text-soft-navy transition-colors duration-200"
               >
                 Cancel
               </button>
               <button
-                onClick={handleDeleteConfirm}
-                className="bg-error text-white px-4 py-2 rounded-md hover:bg-error-600 transition-colors duration-200"
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-soft-rose text-white rounded-md hover:bg-red-600 transition-colors duration-200"
               >
                 Delete
               </button>
@@ -789,58 +734,64 @@ const ScenarioLibrary = () => {
 
       {/* Create Scenario Dialog */}
       {showCreateDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal">
-          <div className="bg-surface border border-border rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white border border-sky-gray rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-text-primary">
+              <h3 className="text-xl font-semibold text-soft-navy">
                 Create New Scenario
               </h3>
               <button
                 onClick={() => setShowCreateDialog(false)}
-                className="p-2 text-text-tertiary hover:text-text-primary transition-colors duration-200"
+                className="p-2 text-slate-gray hover:text-soft-navy transition-colors duration-200"
               >
                 <Icon name="X" size={20} />
               </button>
             </div>
 
+            {/* Quick Start Options */}
             <div className="space-y-4">
               <button
                 onClick={() => {
                   setShowCreateDialog(false);
-                  navigate('/roi-calculator');
+                  navigate('/scenario/create');
                 }}
-                className="w-full p-4 border border-border rounded-lg hover:border-primary hover:bg-surface-700 transition-all duration-200 text-left"
+                className="w-full p-4 border border-sky-gray rounded-lg hover:border-muted-indigo hover:bg-fog-gray transition-all duration-200 text-left"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                  <div className="w-10 h-10 bg-muted-indigo rounded-lg flex items-center justify-center">
                     <Icon name="Plus" size={20} className="text-white" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-text-primary">Start from Scratch</h4>
-                    <p className="text-sm text-text-secondary">Create a custom scenario with your own parameters</p>
+                    <h4 className="font-medium text-soft-navy">Start from Scratch</h4>
+                    <p className="text-sm text-slate-gray">Create a custom scenario with your own parameters</p>
                   </div>
                 </div>
               </button>
 
-              <div className="border-t border-border pt-4">
-                <h4 className="font-medium text-text-primary mb-4">Or choose a template:</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {templateOptions.map((template) => (
+              <div className="border-t border-sky-gray pt-4">
+                <h4 className="font-medium text-soft-navy mb-4">Or choose a template:</h4>
+                <div className="space-y-3">
+                  {[
+                    { name: 'Manufacturing Automation', description: 'Optimize production processes', icon: 'Factory' },
+                    { name: 'Customer Service AI', description: 'Enhance support efficiency', icon: 'Headphones' },
+                    { name: 'Financial Analysis', description: 'Automate reporting tasks', icon: 'Calculator' }
+                  ].map((template, index) => (
                     <button
-                      key={template.id}
-                      onClick={() => handleCreateFromTemplate(template.id)}
-                      className="p-4 border border-border rounded-lg hover:border-primary hover:bg-surface-700 transition-all duration-200 text-left"
+                      key={index}
+                      onClick={() => {
+                        setShowCreateDialog(false);
+                        navigate(`/scenario/create?template=${template.name.toLowerCase().replace(' ', '-')}`);
+                      }}
+                      className="p-4 border border-sky-gray rounded-lg hover:border-muted-indigo hover:bg-fog-gray transition-all duration-200 text-left"
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className="w-10 h-10 bg-surface-700 rounded-lg flex items-center justify-center">
-                          <Icon name={template.icon} size={20} className="text-primary" />
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-fog-gray rounded-lg flex items-center justify-center">
+                          <Icon name={template.icon} size={20} className="text-slate-gray" />
                         </div>
-                        <div className="flex-1">
-                          <h5 className="font-medium text-text-primary mb-1">{template.name}</h5>
-                          <p className="text-sm text-text-secondary mb-2">{template.description}</p>
-                          <div className="text-xs text-text-tertiary">
-                            Includes: {template.processes.join(', ')}
-                          </div>
+                        <div>
+                          <h5 className="font-medium text-soft-navy mb-1">{template.name}</h5>
+                          <p className="text-sm text-slate-gray mb-2">{template.description}</p>
+                          <div className="text-xs text-slate-gray"></div>
                         </div>
                       </div>
                     </button>
@@ -852,10 +803,10 @@ const ScenarioLibrary = () => {
         </div>
       )}
 
-      {/* Floating Action Button (Mobile) */}
+      {/* Mobile Create Button */}
       <button
         onClick={() => setShowCreateDialog(true)}
-        className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-primary text-white rounded-full shadow-elevation flex items-center justify-center hover:bg-primary-700 transition-colors duration-200 z-fab"
+        className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-muted-indigo text-white rounded-full shadow-mist flex items-center justify-center hover:bg-soft-navy transition-colors duration-200 z-50"
       >
         <Icon name="Plus" size={24} />
       </button>

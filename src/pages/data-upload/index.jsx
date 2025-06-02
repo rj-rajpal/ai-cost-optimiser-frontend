@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import Header from '../../components/ui/Header';
-import Breadcrumb from '../../components/ui/Breadcrumb';
 import { useToast, ToastContainer } from '../../components/ui/Toast';
 import UploadZone from './components/UploadZone';
 import UploadHistory from './components/UploadHistory';
@@ -235,55 +233,36 @@ const DataUpload = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="pt-16">
-        <div className="p-6">
-          {/* Page Header */}
-          <div className="mb-8">
-            <Breadcrumb />
-            <div className="mt-4">
-              <h1 className="text-3xl font-bold text-text-primary font-heading">
-                Data Upload
-              </h1>
-              <p className="text-text-secondary mt-2">
-                Import process data through CSV or JSON files to analyze automation opportunities and cost optimization potential.
-              </p>
-            </div>
-          </div>
+    <div className="bg-cloud-white">
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        {/* Left Section - Upload Area and History */}
+        <div className="xl:col-span-8 space-y-6">
+          {/* Upload Zone */}
+          <UploadZone 
+            onFileUpload={handleFileUpload}
+            activeUploads={activeUploads}
+          />
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-            {/* Left Section - Upload Area and History */}
-            <div className="xl:col-span-8 space-y-6">
-              {/* Upload Zone */}
-              <UploadZone 
-                onFileUpload={handleFileUpload}
-                activeUploads={activeUploads}
-              />
-
-              {/* Upload History */}
-              <UploadHistory 
-                uploadHistory={uploadHistory}
-                onRetryUpload={handleRetryUpload}
-                onDeleteUpload={handleDeleteUpload}
-              />
-            </div>
-
-            {/* Right Section - Guidelines and Preview */}
-            <div className="xl:col-span-4 space-y-6">
-              {/* Upload Guidelines */}
-              <UploadGuidelines />
-
-              {/* Data Preview */}
-              {previewData && (
-                <DataPreview data={previewData} />
-              )}
-            </div>
-          </div>
+          {/* Upload History */}
+          <UploadHistory 
+            uploadHistory={uploadHistory}
+            onRetryUpload={handleRetryUpload}
+            onDeleteUpload={handleDeleteUpload}
+          />
         </div>
-      </main>
+
+        {/* Right Section - Guidelines and Preview */}
+        <div className="xl:col-span-4 space-y-6">
+          {/* Upload Guidelines */}
+          <UploadGuidelines />
+
+          {/* Data Preview */}
+          {previewData && (
+            <DataPreview data={previewData} />
+          )}
+        </div>
+      </div>
 
       <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
     </div>

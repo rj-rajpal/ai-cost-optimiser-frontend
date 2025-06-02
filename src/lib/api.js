@@ -1,33 +1,5 @@
 import { supabase } from './supabase';
-
-/**
- * API Configuration
- */
-const API_CONFIG = {
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
-  timeout: 30000, // 30 seconds
-  retryAttempts: 3,
-  retryDelay: 1000, // 1 second
-};
-
-/**
- * HTTP Status Codes
- */
-const HTTP_STATUS = {
-  OK: 200,
-  CREATED: 201,
-  NO_CONTENT: 204,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  CONFLICT: 409,
-  UNPROCESSABLE_ENTITY: 422,
-  INTERNAL_SERVER_ERROR: 500,
-  BAD_GATEWAY: 502,
-  SERVICE_UNAVAILABLE: 503,
-  GATEWAY_TIMEOUT: 504,
-};
+import { API_CONFIG, HTTP_STATUS } from '../constants';
 
 /**
  * Custom API Error class
@@ -109,9 +81,9 @@ function buildURL(endpoint) {
   }
 
   // Handle relative URLs
-  const baseURL = API_CONFIG.baseURL.endsWith('/') 
-    ? API_CONFIG.baseURL.slice(0, -1) 
-    : API_CONFIG.baseURL;
+  const baseURL = API_CONFIG.BASE_URL.endsWith('/') 
+    ? API_CONFIG.BASE_URL.slice(0, -1) 
+    : API_CONFIG.BASE_URL;
   
   const cleanEndpoint = endpoint.startsWith('/') 
     ? endpoint 
@@ -194,7 +166,7 @@ async function handleResponse(response) {
 async function makeRequest(url, options, retryCount = 0) {
   try {
     const controller = new AbortController();
-    const timeoutPromise = createTimeoutPromise(API_CONFIG.timeout);
+    const timeoutPromise = createTimeoutPromise(API_CONFIG.TIMEOUT);
     
     // Combine timeout with abort signal
     const fetchPromise = fetch(url, {
@@ -203,42 +175,33 @@ async function makeRequest(url, options, retryCount = 0) {
     });
 
     // Race between fetch and timeout
-    const response = await Promise.race([
-      fetchPromise,
-      timeoutPromise.then(() => {
-        controller.abort();
-        throw new TimeoutError(`Request timed out after ${API_CONFIG.timeout}ms`, API_CONFIG.timeout);
-      })
-    ]);
-
+    const response = await Promise.race([fetchPromise, timeoutPromise]);
+    
+    // Clear timeout since request completed
+    controller.abort();
+    
     return await handleResponse(response);
   } catch (error) {
-    // Handle network errors and retry logic
-    if (error instanceof APIError) {
-      // Don't retry client errors (4xx)
-      if (error.status >= 400 && error.status < 500) {
+    // Handle network errors, timeouts, and retries
+    if (error instanceof TimeoutError || error.name === 'AbortError') {
+      console.warn(`Request timeout (attempt ${retryCount + 1}/${API_CONFIG.RETRY_ATTEMPTS + 1}):`, error.message);
+    } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      console.warn(`Network error (attempt ${retryCount + 1}/${API_CONFIG.RETRY_ATTEMPTS + 1}):`, error.message);
+      throw new NetworkError('Network request failed. Please check your connection.', error);
+    } else if (error instanceof APIError) {
+      // Don't retry client errors (4xx) except 429 (Rate Limited)
+      if (error.status >= 400 && error.status < 500 && error.status !== 429) {
         throw error;
       }
     }
 
-    // Retry on network errors, timeouts, and server errors (5xx)
-    if (retryCount < API_CONFIG.retryAttempts) {
-      const shouldRetry = error instanceof NetworkError || 
-                         error instanceof TimeoutError ||
-                         (error instanceof APIError && error.status >= 500);
-
-      if (shouldRetry) {
-        console.warn(`Request failed, retrying... (${retryCount + 1}/${API_CONFIG.retryAttempts})`, error.message);
-        await sleep(API_CONFIG.retryDelay * (retryCount + 1)); // Exponential backoff
-        return makeRequest(url, options, retryCount + 1);
-      }
+    // Retry logic for timeout, network, or server errors
+    if (retryCount < API_CONFIG.RETRY_ATTEMPTS) {
+      await new Promise(resolve => setTimeout(resolve, API_CONFIG.RETRY_DELAY));
+      return makeRequest(url, options, retryCount + 1);
     }
 
-    // Convert fetch errors to NetworkError
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      throw new NetworkError('Network connection failed', error);
-    }
-
+    // Max retries exceeded
     throw error;
   }
 }
@@ -251,7 +214,7 @@ async function apiRequest(endpoint, options = {}) {
     method = 'GET',
     body = null,
     headers = {},
-    timeout = API_CONFIG.timeout,
+    timeout = API_CONFIG.TIMEOUT,
     skipAuth = false,
     ...otherOptions
   } = options;
@@ -492,22 +455,22 @@ export const apiConfig = {
    * Set base URL
    */
   setBaseURL: (url) => {
-    API_CONFIG.baseURL = url;
+    API_CONFIG.BASE_URL = url;
   },
 
   /**
    * Set timeout
    */
   setTimeout: (timeout) => {
-    API_CONFIG.timeout = timeout;
+    API_CONFIG.TIMEOUT = timeout;
   },
 
   /**
    * Set retry configuration
    */
   setRetryConfig: (attempts, delay) => {
-    API_CONFIG.retryAttempts = attempts;
-    API_CONFIG.retryDelay = delay;
+    API_CONFIG.RETRY_ATTEMPTS = attempts;
+    API_CONFIG.RETRY_DELAY = delay;
   },
 
   /**

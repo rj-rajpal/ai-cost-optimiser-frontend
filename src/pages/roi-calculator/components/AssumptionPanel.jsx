@@ -29,26 +29,26 @@ const AssumptionPanel = ({ assumptions, onChange }) => {
 
   return (
     <div className="sticky top-20">
-      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      <div className="bg-white border border-sky-gray rounded-lg overflow-hidden shadow-mist">
         {/* Panel Header */}
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-sky-gray">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Icon name="Settings" size={20} className="text-text-tertiary" />
-              <h3 className="text-lg font-semibold text-text-primary font-heading">
+              <Icon name="Settings" size={20} className="text-slate-gray" />
+              <h3 className="text-lg font-semibold text-soft-navy">
                 Assumptions
               </h3>
             </div>
             
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="xl:hidden p-1 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-700 transition-colors duration-200"
+              className="xl:hidden p-1 rounded-md text-slate-gray hover:text-soft-navy hover:bg-fog-gray transition-colors duration-200"
             >
               <Icon name={isCollapsed ? "ChevronDown" : "ChevronUp"} size={16} />
             </button>
           </div>
           
-          <p className="text-sm text-text-secondary mt-1">
+          <p className="text-sm text-slate-gray mt-1">
             Adjust parameters to see real-time ROI changes
           </p>
         </div>
@@ -58,7 +58,7 @@ const AssumptionPanel = ({ assumptions, onChange }) => {
           <div className="p-4 space-y-6">
             {/* Task Frequency */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-medium text-soft-navy mb-2">
                 Task Frequency
               </label>
               <div className="space-y-2">
@@ -69,11 +69,11 @@ const AssumptionPanel = ({ assumptions, onChange }) => {
                   step="100"
                   value={assumptions.taskFrequency}
                   onChange={(e) => handleSliderChange('taskFrequency', e.target.value)}
-                  className="w-full h-2 bg-surface-700 rounded-lg appearance-none cursor-pointer slider"
+                  className="w-full h-2 bg-fog-gray rounded-lg appearance-none cursor-pointer slider"
                 />
-                <div className="flex justify-between text-xs text-text-tertiary">
+                <div className="flex justify-between text-xs text-slate-gray">
                   <span>100</span>
-                  <span className="font-medium text-text-primary">
+                  <span className="font-medium text-soft-navy">
                     {formatNumber(assumptions.taskFrequency)} tasks/month
                   </span>
                   <span>10,000</span>
@@ -83,13 +83,13 @@ const AssumptionPanel = ({ assumptions, onChange }) => {
 
             {/* Model Selection */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-medium text-soft-navy mb-2">
                 Model Type
               </label>
               <select
                 value={assumptions.modelType}
                 onChange={(e) => handleSelectChange('modelType', e.target.value)}
-                className="w-full bg-surface-700 border border-border text-text-primary text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
+                className="w-full bg-cloud-white border border-sky-gray text-soft-navy text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-muted-indigo focus:border-muted-indigo transition-colors duration-200"
               >
                 {modelOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -101,8 +101,8 @@ const AssumptionPanel = ({ assumptions, onChange }) => {
 
             {/* Latency Target */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
-                Latency Target
+              <label className="block text-sm font-medium text-soft-navy mb-2">
+                Latency Target (ms)
               </label>
               <div className="space-y-2">
                 <input
@@ -112,11 +112,11 @@ const AssumptionPanel = ({ assumptions, onChange }) => {
                   step="50"
                   value={assumptions.latencyTarget}
                   onChange={(e) => handleSliderChange('latencyTarget', e.target.value)}
-                  className="w-full h-2 bg-surface-700 rounded-lg appearance-none cursor-pointer slider"
+                  className="w-full h-2 bg-fog-gray rounded-lg appearance-none cursor-pointer slider"
                 />
-                <div className="flex justify-between text-xs text-text-tertiary">
+                <div className="flex justify-between text-xs text-slate-gray">
                   <span>100ms</span>
-                  <span className="font-medium text-text-primary">
+                  <span className="font-medium text-soft-navy">
                     {assumptions.latencyTarget}ms
                   </span>
                   <span>1000ms</span>
@@ -126,32 +126,32 @@ const AssumptionPanel = ({ assumptions, onChange }) => {
 
             {/* Data Volume */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
-                Data Volume per Task
+              <label className="block text-sm font-medium text-soft-navy mb-2">
+                Data Volume (KB per task)
               </label>
               <div className="space-y-2">
                 <input
                   type="range"
-                  min="10"
-                  max="500"
-                  step="10"
+                  min="1"
+                  max="100"
+                  step="1"
                   value={assumptions.dataVolume}
                   onChange={(e) => handleSliderChange('dataVolume', e.target.value)}
-                  className="w-full h-2 bg-surface-700 rounded-lg appearance-none cursor-pointer slider"
+                  className="w-full h-2 bg-fog-gray rounded-lg appearance-none cursor-pointer slider"
                 />
-                <div className="flex justify-between text-xs text-text-tertiary">
-                  <span>10KB</span>
-                  <span className="font-medium text-text-primary">
+                <div className="flex justify-between text-xs text-slate-gray">
+                  <span>1KB</span>
+                  <span className="font-medium text-soft-navy">
                     {assumptions.dataVolume}KB
                   </span>
-                  <span>500KB</span>
+                  <span>100KB</span>
                 </div>
               </div>
             </div>
 
             {/* Concurrent Users */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-medium text-soft-navy mb-2">
                 Concurrent Users
               </label>
               <div className="space-y-2">
@@ -162,79 +162,25 @@ const AssumptionPanel = ({ assumptions, onChange }) => {
                   step="1"
                   value={assumptions.concurrentUsers}
                   onChange={(e) => handleSliderChange('concurrentUsers', e.target.value)}
-                  className="w-full h-2 bg-surface-700 rounded-lg appearance-none cursor-pointer slider"
+                  className="w-full h-2 bg-fog-gray rounded-lg appearance-none cursor-pointer slider"
                 />
-                <div className="flex justify-between text-xs text-text-tertiary">
+                <div className="flex justify-between text-xs text-slate-gray">
                   <span>1</span>
-                  <span className="font-medium text-text-primary">
+                  <span className="font-medium text-soft-navy">
                     {assumptions.concurrentUsers} users
                   </span>
                   <span>100</span>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Quick Presets */}
-          <div className="p-4 border-t border-border">
-            <h4 className="text-sm font-medium text-text-primary mb-3">
-              Quick Presets
-            </h4>
-            
-            <div className="space-y-2">
-              <button
-                onClick={() => {
-                  onChange('taskFrequency', 500);
-                  onChange('dataVolume', 25);
-                  onChange('concurrentUsers', 5);
-                }}
-                className="w-full text-left px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-700 rounded-md transition-colors duration-200"
-              >
-                <div className="font-medium">Small Scale</div>
-                <div className="text-xs text-text-tertiary">500 tasks, 25KB, 5 users</div>
-              </button>
-              
-              <button
-                onClick={() => {
-                  onChange('taskFrequency', 2500);
-                  onChange('dataVolume', 100);
-                  onChange('concurrentUsers', 25);
-                }}
-                className="w-full text-left px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-700 rounded-md transition-colors duration-200"
-              >
-                <div className="font-medium">Medium Scale</div>
-                <div className="text-xs text-text-tertiary">2.5K tasks, 100KB, 25 users</div>
-              </button>
-              
-              <button
-                onClick={() => {
-                  onChange('taskFrequency', 7500);
-                  onChange('dataVolume', 250);
-                  onChange('concurrentUsers', 75);
-                }}
-                className="w-full text-left px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-700 rounded-md transition-colors duration-200"
-              >
-                <div className="font-medium">Enterprise Scale</div>
-                <div className="text-xs text-text-tertiary">7.5K tasks, 250KB, 75 users</div>
+            {/* Save Preset Button */}
+            <div className="pt-4 border-t border-sky-gray">
+              <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-muted-indigo text-white rounded-md hover:bg-soft-navy transition-colors duration-200">
+                <Icon name="Save" size={16} />
+                <span>Save as Preset</span>
               </button>
             </div>
-          </div>
-
-          {/* Reset Button */}
-          <div className="p-4 border-t border-border">
-            <button
-              onClick={() => {
-                onChange('taskFrequency', 1000);
-                onChange('modelType', 'gpt-4');
-                onChange('latencyTarget', 500);
-                onChange('dataVolume', 50);
-                onChange('concurrentUsers', 10);
-              }}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-surface-700 text-text-primary border border-border rounded-md hover:bg-surface-600 transition-colors duration-200"
-            >
-              <Icon name="RotateCcw" size={16} />
-              <span>Reset to Defaults</span>
-            </button>
           </div>
         </div>
       </div>

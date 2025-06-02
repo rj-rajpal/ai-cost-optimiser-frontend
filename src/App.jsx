@@ -1,5 +1,6 @@
 import React from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { DarkModeProvider } from "./contexts/DarkModeContext";
 import Routes from "./Routes";
 import "./styles/tailwind.css";
 import "./styles/index.css";
@@ -39,9 +40,11 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <DarkModeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </DarkModeProvider>
   );
 }
 
