@@ -43,16 +43,6 @@ export const AuthProvider = ({ children }) => {
         
         setUser(session?.user ?? null);
         setLoading(false);
-
-        // Handle OAuth callback - clean up URL after successful sign in
-        if (event === 'SIGNED_IN' && session) {
-          // Check if we're on a page with OAuth callback parameters
-          if (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token')) {
-            // Clean up the URL by removing hash fragments
-            const cleanUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
-          }
-        }
       }
     );
 
@@ -119,11 +109,8 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/projects`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
+          redirectTo: `${window.location.origin}/auth/callback`,
+          flow: 'pkce'
         },
       });
       return { data, error };

@@ -18,6 +18,7 @@ import ROICalculator from "pages/roi-calculator";
 import AIWorkflow from "pages/AIWorkflow";
 import Login from "pages/login";
 import Signup from "pages/signup";
+import AuthCallback from "pages/AuthCallback";
 
 const Routes = () => {
   return (
@@ -30,6 +31,7 @@ const Routes = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             
             {/* Protected Routes with Dashboard Context */}
             <Route element={
