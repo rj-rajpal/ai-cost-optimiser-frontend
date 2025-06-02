@@ -148,6 +148,8 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
+    signIn: signInWithEmail,
+    signUp: signUpWithEmail,
     signInWithEmail,
     signUpWithEmail,
     signInWithProvider,

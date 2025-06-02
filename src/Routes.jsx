@@ -15,7 +15,6 @@ import ProjectDetail from "pages/project-detail";
 import OnboardingWizard from "pages/onboarding-wizard";
 import Dashboard from "pages/dashboard";
 import ROICalculator from "pages/roi-calculator";
-import ProjectArchitecture from "pages/ProjectArchitecture";
 import AIWorkflow from "pages/AIWorkflow";
 import Login from "pages/login";
 import Signup from "pages/signup";
