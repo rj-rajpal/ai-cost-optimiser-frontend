@@ -42,6 +42,9 @@ export const AuthProvider = ({ children }) => {
         console.log('Auth state change:', event, session?.user?.email);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Note: OAuth callbacks are handled by the dedicated /auth/callback route
+        // which uses getSessionFromUrl() to process the authentication
       }
     );
 

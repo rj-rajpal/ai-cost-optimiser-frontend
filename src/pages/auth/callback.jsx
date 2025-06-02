@@ -10,12 +10,13 @@ const AuthCallback = () => {
     const handleAuthCallback = async () => {
       try {
         setStatus('processing');
+        console.log('Processing OAuth callback...');
         
-        // Let Supabase handle the OAuth callback
-        const { data, error } = await supabase.auth.getSession();
+        // Use getSessionFromUrl to extract session from OAuth callback URL
+        const { data, error } = await supabase.auth.getSessionFromUrl();
         
         if (error) {
-          console.error('Auth callback error:', error);
+          console.error('OAuth callback error:', error);
           setStatus('error');
           
           // Redirect to login with error after delay
@@ -27,14 +28,15 @@ const AuthCallback = () => {
 
         if (data?.session?.user) {
           console.log('Authentication successful:', data.session.user.email);
+          console.log('Session data:', data.session);
           setStatus('success');
           
           // Success - redirect to projects page cleanly
           setTimeout(() => {
             navigate('/projects', { replace: true });
-          }, 1000);
+          }, 1500);
         } else {
-          console.log('No session found');
+          console.log('No session found in URL');
           setStatus('error');
           
           setTimeout(() => {
@@ -51,8 +53,14 @@ const AuthCallback = () => {
       }
     };
 
-    // Process the callback
-    handleAuthCallback();
+    // Only process if we're actually on the callback URL with hash parameters
+    if (window.location.hash) {
+      console.log('Hash detected:', window.location.hash);
+      handleAuthCallback();
+    } else {
+      console.log('No hash parameters found, redirecting to login');
+      navigate('/login', { replace: true });
+    }
   }, [navigate]);
 
   return (
