@@ -87,7 +87,7 @@ const WorkloadParams = ({
       
       // Call the onApiUpdate callback if provided
       if (onApiUpdate) {
-        onApiUpdate(updatedData)
+        onApiUpdate(updatedData?.structured_data)
       }
 
     } catch (error) {
