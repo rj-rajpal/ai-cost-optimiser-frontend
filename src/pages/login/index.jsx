@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDarkMode } from '../../contexts/DarkModeContext';
@@ -8,6 +8,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { signIn, signInWithProvider } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const [searchParams] = useSearchParams();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -16,6 +17,16 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Check for OAuth errors in URL parameters
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam === 'oauth_failed') {
+      setError('Authentication failed. Please try again.');
+    } else if (errorParam === 'callback_failed') {
+      setError('Authentication callback failed. Please try again.');
+    }
+  }, [searchParams]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
