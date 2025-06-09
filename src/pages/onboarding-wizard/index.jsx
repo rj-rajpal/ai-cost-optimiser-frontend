@@ -734,8 +734,8 @@ const OnboardingWizard = () => {
       <div className={`${message.type === 'user' ? CHAT.USER_BUBBLE : CHAT.BOT_BUBBLE} ${
         isDarkMode 
           ? message.type === 'user' 
-            ? 'bg-muted-indigo text-black' 
-            : 'bg-gray-900 border-gray-700 text-white'
+            ? 'bg-muted-indigo text-white' 
+            : 'bg-gray-900 border-gray-700'
           : ''
       }`}>
         <ReactMarkdown 
@@ -743,65 +743,83 @@ const OnboardingWizard = () => {
             // Custom styling for markdown elements with dark mode support
             p: ({ children }) => (
               <p className={`mb-3 leading-relaxed ${
-                message.type === 'bot'
-                  ? isDarkMode ? 'text-white' : 'text-gray-700'
-                  : isDarkMode ? 'text-white' : 'text-gray-800'
+                isDarkMode 
+                  ? 'text-gray-100' 
+                  : message.type === 'bot' 
+                    ? 'text-gray-700' 
+                    : 'text-gray-800'
               }`}>
                 {children}
               </p>
             ),
             strong: ({ children }) => (
               <strong className={`font-semibold ${
-                isDarkMode ? 'text-white' : 'text-soft-navy'
+                isDarkMode 
+                  ? 'text-white' 
+                  : 'text-soft-navy'
               }`}>
                 {children}
               </strong>
             ),
             em: ({ children }) => (
               <em className={`italic ${
-                isDarkMode ? 'text-gray-200' : 'text-gray-600'
+                isDarkMode 
+                  ? 'text-gray-200' 
+                  : 'text-gray-600'
               }`}>
                 {children}
               </em>
             ),
             ul: ({ children }) => (
               <ul className={`list-disc list-inside mb-4 space-y-2 ml-4 ${
-                isDarkMode ? 'text-white' : 'text-gray-700'
+                isDarkMode 
+                  ? 'text-gray-100' 
+                  : 'text-gray-700'
               }`}>
                 {children}
               </ul>
             ),
             ol: ({ children }) => (
               <ol className={`list-decimal list-inside mb-4 space-y-2 ml-4 ${
-                isDarkMode ? 'text-white' : 'text-gray-700'
+                isDarkMode 
+                  ? 'text-gray-100' 
+                  : 'text-gray-700'
               }`}>
                 {children}
               </ol>
             ),
             li: ({ children }) => (
               <li className={`leading-relaxed ${
-                isDarkMode ? 'text-white' : 'text-gray-700'
+                isDarkMode 
+                  ? 'text-gray-100' 
+                  : 'text-gray-700'
               }`}>
                 {children}
               </li>
             ),
             h1: ({ children }) => (
               <h1 className={`text-xl font-bold mb-4 mt-6 ${
-                isDarkMode ? 'text-white' : 'text-soft-navy'
+                isDarkMode 
+                  ? 'text-white' 
+                  : 'text-soft-navy'
               }`}>
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
               <h2 className={`text-lg font-semibold mb-3 mt-5 ${
-                isDarkMode ? 'text-white' : 'text-soft-navy'
+                isDarkMode 
+                  ? 'text-white' 
+                  : 'text-soft-navy'
               }`}>
                 {children}
               </h2>
             ),
             h3: ({ children }) => (
               <h3 className={`text-base font-semibold mb-2 mt-4 ${
-                isDarkMode ? 'text-white' : 'text-soft-navy'
+                isDarkMode 
+                  ? 'text-white' 
+                  : 'text-soft-navy'
               }`}>
                 {children}
               </h3>
@@ -809,20 +827,26 @@ const OnboardingWizard = () => {
             code: ({ inline, children }) => 
               inline ? (
                 <code className={`px-2 py-1 rounded text-sm font-mono ${
-                  isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'
+                  isDarkMode 
+                    ? 'bg-gray-800 text-gray-200' 
+                    : 'bg-gray-100 text-gray-800'
                 }`}>
                   {children}
                 </code>
               ) : (
                 <pre className={`p-3 rounded-lg text-sm font-mono overflow-x-auto mb-4 ${
-                  isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'
+                  isDarkMode 
+                    ? 'bg-gray-800 text-gray-200' 
+                    : 'bg-gray-100 text-gray-800'
                 }`}>
                   <code>{children}</code>
                 </pre>
               ),
             blockquote: ({ children }) => (
               <blockquote className={`border-l-4 border-muted-indigo pl-4 italic mb-4 ${
-                isDarkMode ? 'text-gray-300' : 'text-slate-gray'
+                isDarkMode 
+                  ? 'text-gray-300' 
+                  : 'text-slate-gray'
               }`}>
                 {children}
               </blockquote>
@@ -832,7 +856,11 @@ const OnboardingWizard = () => {
                 href={href} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-muted-indigo hover:text-muted-indigo/80 underline font-medium"
+                className={`underline font-medium transition-colors ${
+                  isDarkMode 
+                    ? 'text-blue-400 hover:text-blue-300' 
+                    : 'text-muted-indigo hover:text-muted-indigo/80'
+                }`}
               >
                 {children}
               </a>
