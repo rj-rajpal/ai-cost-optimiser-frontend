@@ -644,65 +644,6 @@ const OnboardingWizard = () => {
     }
   }, [processStructuredData, navigate]);
 
-  // Test function for successful structured data response
-  const handleTestSuccessFlow = useCallback(async () => {
-    const testMessage = "We process 500 support emails daily, need AI to tag priority and draft replies";
-    
-    setMessages(prevMessages => [
-      ...prevMessages,
-      { type: 'user', text: testMessage }
-    ]);
-    
-    setIsLoading(true);
-    
-    // Simulate API response with structured data after 1 second
-    setTimeout(async () => {
-      const structuredData = mockStructuredData.structured_data;
-      
-      try {
-        // Create a temporary project to get ID for testing
-        const testChatHistory = [{ type: 'user', text: testMessage }];
-        const projectName = await extractProjectName(testChatHistory, structuredData);
-        const projectDescription = await generateProjectDescription(projectName, testChatHistory, structuredData);
-        const projectSummary = await generateProjectSummary(projectName, projectDescription, testChatHistory, structuredData);
-        const projectData = projectService.processStructuredDataToProject(
-          structuredData, 
-          projectName, 
-          testChatHistory,
-          projectDescription,
-          projectSummary
-        );
-        
-        // Process structured data using dashboard context with project ID
-        processStructuredData(structuredData, projectData.id);
-        
-        // Show the dashboard generation message
-        setMessages(prevMessages => [
-          ...prevMessages,
-          { 
-            type: 'bot', 
-            text: "Please wait while we generate the Dashboard for you",
-            structuredData: structuredData,
-            isDashboardGenerating: true
-          }
-        ]);
-        
-        setIsLoading(false);
-        
-        // Process and save as project after delay
-        setTimeout(() => {
-          handleCreateProject(structuredData, [
-            ...messages,
-            { type: 'user', text: testMessage }
-          ]);
-        }, 2000);
-      } catch (error) {
-        console.error('Error in test success flow:', error);
-        setIsLoading(false);
-      }
-    }, 1000);
-  }, [processStructuredData, messages]);
-
   // Test function for null structured data response
   const handleTestErrorFlow = useCallback(() => {
     const testMessage = "We process 500 support emails daily, need AI to tag priority and draft replies";

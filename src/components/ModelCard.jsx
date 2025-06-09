@@ -85,17 +85,67 @@ const ModelCard = ({
 
   const kpis = model.kpis || {}
 
+  // Generate tooltip text based on constraint violations
+  const getConstraintTooltipText = (constraintViolations) => {
+    if (!constraintViolations || constraintViolations.length === 0) {
+      return "Model meets all requirements"
+    }
+    
+    const violationMessages = {
+      'context_window_too_small': 'Context window is too small for your requirements',
+      'latency_too_high': 'Latency exceeds your SLA requirements',
+      'compliance_violation': 'Model does not meet compliance constraints',
+      'region_not_supported': 'Model not available in your specified region'
+    }
+    
+    return constraintViolations
+      .map(violation => violationMessages[violation] || `Constraint violation: ${violation}`)
+      .join('. ')
+  }
+
   return (
     <div className={`rounded-2xl border p-6 hover:shadow-xl transition-all duration-200 ${
       isDarkMode 
         ? 'bg-black border-gray-800 hover:border-gray-600 shadow-2xl' 
         : 'bg-white shadow-mist border-sky-gray hover:border-muted-indigo/30'
     } ${className}`}>
-      {/* Ranking Badge */}
-      <div className="flex justify-start mb-4">
-        <div className={`inline-flex items-center justify-center w-12 h-8 rounded-lg font-bold text-lg ${getBadgeStyle(index + 1)}`}>
+      {/* Header with Ranking Badge and Suitability Indicator */}
+      <div className="flex justify-between items-start mb-4">
+        <div className={`inline-flex items-center justify-center w-12 h-8 rounded-lg font-bold text-lg flex-shrink-0 ${getBadgeStyle(index + 1)}`}>
           #{index + 1}
         </div>
+        
+        {/* Suitability Indicator */}
+        {model.suitable === false && (
+          <div className="flex flex-col items-end space-y-1 group relative ml-4">
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
+              <span className="text-sm font-medium text-red-500">
+                Not Recommended
+              </span>
+            </div>
+            <div className="relative flex-shrink-0">
+              <Icon name="Info" size={14} className="text-red-500 cursor-help" />
+              
+              {/* Tooltip */}
+              <div className={`absolute right-0 top-6 w-64 p-3 rounded-lg border shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 ${
+                isDarkMode 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}>
+                <div className={`text-xs leading-relaxed ${
+                  isDarkMode ? 'text-white' : 'text-black'
+                }`}>
+                  {getConstraintTooltipText(model.constraint_violations)}
+                </div>
+                {/* Tooltip arrow */}
+                <div className={`absolute -top-1 right-4 w-2 h-2 rotate-45 border-l border-t ${
+                  isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+                }`}></div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Model Name */}
