@@ -5,7 +5,7 @@ import { useDarkMode } from '../../contexts/DarkModeContext';
 import Icon from '../../components/AppIcon';
 import WorkloadParams from '../../components/WorkloadParams';
 import ROICard from '../../components/ROICard';
-import { SplashCursor } from '../../components/ui/splash-cursor';
+import { ShapeBackground } from '../../components/ui/shape-background';
 
 const ROICalculator = () => {
   const navigate = useNavigate();
@@ -83,10 +83,8 @@ const ROICalculator = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+              {/* Shape Background */}
+        <ShapeBackground />
       
       <div className="relative z-10">
         <div className={`p-6 min-h-screen space-y-6 transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>

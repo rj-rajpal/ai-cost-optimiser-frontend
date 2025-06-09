@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { Button } from '../components/ui/button';
-import { SplashCursor } from '../components/ui/splash-cursor';
+import { ShapeBackground } from '../components/ui/shape-background';
 import { 
   ChartBar, 
   Target, 
@@ -126,10 +126,8 @@ const LandingPage = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 relative ${isDarkMode ? 'bg-black text-white' : 'bg-cloud-white text-charcoal-black'}`}>
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+      {/* Shape Background */}
+      <ShapeBackground />
       
       {/* Header */}
       <header className={`${isDarkMode ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-sky-gray'} backdrop-blur-sm border-b sticky top-0 z-50 transition-colors duration-300 relative`}>

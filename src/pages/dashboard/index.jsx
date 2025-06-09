@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDashboard } from '../../contexts/DashboardContext';
 import { useDarkMode } from '../../contexts/DarkModeContext';
-import { transform } from '../../lib/transform';
 import Icon from '../../components/AppIcon';
 import WorkloadParams from '../../components/WorkloadParams';
 import ModelRanking from '../../components/ModelRanking';
-import { KPI } from './components/KPI';
-import SpendVsTokensChart from './components/SpendVsTokensChart';
-import { SplashCursor } from '../../components/ui/splash-cursor';
+import { ShapeBackground } from '../../components/ui/shape-background';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { projectId } = useParams();
   const { dashboardData, isLoading: dashboardLoading, processStructuredData } = useDashboard();
   const { isDarkMode } = useDarkMode();
   
@@ -78,10 +74,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+              {/* Shape Background */}
+        <ShapeBackground />
       
       <div className="relative z-10">
         <div className={`p-6 min-h-screen space-y-6 transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>

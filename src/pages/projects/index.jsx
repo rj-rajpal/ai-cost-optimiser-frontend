@@ -6,7 +6,7 @@ import Icon from '../../components/AppIcon';
 import SideNavBar from '../../components/SideNavBar';
 import { ProjectGradientCard } from '../../components/ProjectGradientCard';
 import { getDynamicStyles } from '../../utils/darkModeStyles';
-import { SplashCursor } from '../../components/ui/splash-cursor';
+import { ShapeBackground } from '../../components/ui/shape-background';
 
 const ProjectsPage = () => {
   const navigate = useNavigate();
@@ -114,10 +114,8 @@ const ProjectsPage = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+              {/* Shape Background */}
+        <ShapeBackground />
       
       {/* SideNavBar Component */}
       <SideNavBar

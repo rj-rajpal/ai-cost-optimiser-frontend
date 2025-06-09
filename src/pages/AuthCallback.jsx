@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { SplashCursor } from '../components/ui/splash-cursor';
+import { ShapeBackground } from '../components/ui/shape-background';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -29,10 +29,8 @@ const AuthCallback = () => {
   // Show loading spinner while processing
   return (
     <div className="min-h-screen bg-cloud-white flex items-center justify-center relative">
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+              {/* Shape Background */}
+        <ShapeBackground />
       
       <div className="text-center relative z-10">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-muted-indigo mx-auto mb-4"></div>

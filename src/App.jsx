@@ -2,16 +2,14 @@ import React from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DarkModeProvider } from "./contexts/DarkModeContext";
 import Routes from "./Routes";
-import { SplashCursor } from "./components/ui/splash-cursor";
+import { ShapeBackground } from "./components/ui/shape-background";
 import "./styles/tailwind.css";
 import "./styles/index.css";
 
 // Loading Component
 const LoadingScreen = () => (
   <div className="min-h-screen bg-background flex items-center justify-center relative">
-    <div className="fixed inset-0 z-0">
-      <SplashCursor />
-    </div>
+          <ShapeBackground />
     <div className="text-center relative z-10">
       <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4 animate-pulse">
         <svg

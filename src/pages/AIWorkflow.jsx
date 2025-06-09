@@ -6,7 +6,7 @@ import { useDarkMode } from '@/contexts/DarkModeContext'
 import { useParams } from 'react-router-dom'
 import { projectService } from '@/services'
 import { useEffect, useState, useMemo } from 'react'
-import { SplashCursor } from '../components/ui/splash-cursor'
+import { ShapeBackground } from '../components/ui/shape-background'
 
 export default function AIWorkflow() {
   const { projectId } = useParams()
@@ -117,10 +117,8 @@ export default function AIWorkflow() {
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+              {/* Shape Background */}
+        <ShapeBackground />
       
       <div className="relative z-10">
         <div className={`space-y-8 p-6 min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-cloud-white'}`}>

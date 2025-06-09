@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDarkMode } from '../../contexts/DarkModeContext';
-import { SplashCursor } from '../../components/ui/splash-cursor';
+import { ShapeBackground } from '../../components/ui/shape-background';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -83,10 +83,8 @@ const LoginPage = () => {
     <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 relative ${
       isDarkMode ? 'bg-black' : 'bg-cloud-white'
     }`}>
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+              {/* Shape Background */}
+        <ShapeBackground />
       
       <div className="w-full max-w-md relative z-10">
         {/* Header with Dark Mode Toggle and Back Link */}

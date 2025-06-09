@@ -15,7 +15,7 @@ import {
   NAVIGATION,
   MESSAGES 
 } from '../../constants';
-import { SplashCursor } from '../../components/ui/splash-cursor';
+import { ShapeBackground } from '../../components/ui/shape-background';
 
 // Utility functions
 const toPascalCase = (str) => {
@@ -146,10 +146,8 @@ const ProjectDetail = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+              {/* Shape Background */}
+        <ShapeBackground />
       
       <div className="relative z-10">
         {/* SideNavBar Component */}

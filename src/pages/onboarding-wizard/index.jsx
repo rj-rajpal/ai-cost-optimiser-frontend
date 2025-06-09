@@ -21,7 +21,7 @@ import {
   API_ENDPOINTS 
 } from '../../constants';
 import { mockStructuredData } from '../../lib/testData';
-import { SplashCursor } from '../../components/ui/splash-cursor';
+import { ShapeBackground } from '../../components/ui/shape-background';
 
 // Helper function to convert frontend messages to API format
 const toApiMessages = (messages) =>
@@ -834,10 +834,8 @@ const OnboardingWizard = () => {
     <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
       isDarkMode ? 'bg-black' : 'bg-cloud-white'
     }`}>
-      {/* Splash Cursor Background */}
-      <div className="fixed inset-0 z-0">
-        <SplashCursor />
-      </div>
+              {/* Shape Background */}
+        <ShapeBackground />
       {/* SideNavBar Component */}
       <SideNavBar 
         isOpen={isSidebarOpen} 
