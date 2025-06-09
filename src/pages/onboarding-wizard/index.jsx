@@ -735,119 +735,121 @@ const OnboardingWizard = () => {
         isDarkMode 
           ? message.type === 'user' 
             ? 'bg-muted-indigo text-white' 
-            : 'bg-gray-900 border-gray-700'
+            : '!bg-gray-900 !border-gray-700 !text-white'
           : ''
       }`}>
         <ReactMarkdown 
           components={{
             // Custom styling for markdown elements with dark mode support
             p: ({ children }) => (
-              <p className={`mb-3 leading-relaxed ${
-                isDarkMode 
-                  ? 'text-gray-100' 
-                  : message.type === 'bot' 
-                    ? 'text-gray-700' 
-                    : 'text-gray-800'
-              }`}>
+              <p 
+                className={`mb-3 leading-relaxed ${
+                  !isDarkMode 
+                    ? message.type === 'bot' 
+                      ? 'text-gray-700' 
+                      : 'text-gray-800'
+                    : ''
+                }`}
+                style={isDarkMode ? { color: '#ffffff' } : {}}
+              >
                 {children}
               </p>
             ),
             strong: ({ children }) => (
-              <strong className={`font-semibold ${
-                isDarkMode 
-                  ? 'text-white' 
-                  : 'text-soft-navy'
-              }`}>
+              <strong 
+                className={`font-semibold ${!isDarkMode ? 'text-soft-navy' : ''}`}
+                style={isDarkMode ? { color: '#ffffff' } : {}}
+              >
                 {children}
               </strong>
             ),
             em: ({ children }) => (
-              <em className={`italic ${
-                isDarkMode 
-                  ? 'text-gray-200' 
-                  : 'text-gray-600'
-              }`}>
+              <em 
+                className={`italic ${!isDarkMode ? 'text-gray-600' : ''}`}
+                style={isDarkMode ? { color: '#e5e7eb' } : {}}
+              >
                 {children}
               </em>
             ),
             ul: ({ children }) => (
-              <ul className={`list-disc list-inside mb-4 space-y-2 ml-4 ${
-                isDarkMode 
-                  ? 'text-gray-100' 
-                  : 'text-gray-700'
-              }`}>
+              <ul 
+                className={`list-disc list-inside mb-4 space-y-2 ml-4 ${!isDarkMode ? 'text-gray-700' : ''}`}
+                style={isDarkMode ? { color: '#ffffff' } : {}}
+              >
                 {children}
               </ul>
             ),
             ol: ({ children }) => (
-              <ol className={`list-decimal list-inside mb-4 space-y-2 ml-4 ${
-                isDarkMode 
-                  ? 'text-gray-100' 
-                  : 'text-gray-700'
-              }`}>
+              <ol 
+                className={`list-decimal list-inside mb-4 space-y-2 ml-4 ${!isDarkMode ? 'text-gray-700' : ''}`}
+                style={isDarkMode ? { color: '#ffffff' } : {}}
+              >
                 {children}
               </ol>
             ),
             li: ({ children }) => (
-              <li className={`leading-relaxed ${
-                isDarkMode 
-                  ? 'text-gray-100' 
-                  : 'text-gray-700'
-              }`}>
+              <li 
+                className={`leading-relaxed ${!isDarkMode ? 'text-gray-700' : ''}`}
+                style={isDarkMode ? { color: '#ffffff' } : {}}
+              >
                 {children}
               </li>
             ),
             h1: ({ children }) => (
-              <h1 className={`text-xl font-bold mb-4 mt-6 ${
-                isDarkMode 
-                  ? 'text-white' 
-                  : 'text-soft-navy'
-              }`}>
+              <h1 
+                className={`text-xl font-bold mb-4 mt-6 ${!isDarkMode ? 'text-soft-navy' : ''}`}
+                style={isDarkMode ? { color: '#ffffff' } : {}}
+              >
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
-              <h2 className={`text-lg font-semibold mb-3 mt-5 ${
-                isDarkMode 
-                  ? 'text-white' 
-                  : 'text-soft-navy'
-              }`}>
+              <h2 
+                className={`text-lg font-semibold mb-3 mt-5 ${!isDarkMode ? 'text-soft-navy' : ''}`}
+                style={isDarkMode ? { color: '#ffffff' } : {}}
+              >
                 {children}
               </h2>
             ),
             h3: ({ children }) => (
-              <h3 className={`text-base font-semibold mb-2 mt-4 ${
-                isDarkMode 
-                  ? 'text-white' 
-                  : 'text-soft-navy'
-              }`}>
+              <h3 
+                className={`text-base font-semibold mb-2 mt-4 ${!isDarkMode ? 'text-soft-navy' : ''}`}
+                style={isDarkMode ? { color: '#ffffff' } : {}}
+              >
                 {children}
               </h3>
             ),
             code: ({ inline, children }) => 
               inline ? (
-                <code className={`px-2 py-1 rounded text-sm font-mono ${
-                  isDarkMode 
-                    ? 'bg-gray-800 text-gray-200' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
+                <code 
+                  className={`px-2 py-1 rounded text-sm font-mono ${
+                    isDarkMode 
+                      ? 'bg-gray-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                  style={isDarkMode ? { color: '#e5e7eb' } : {}}
+                >
                   {children}
                 </code>
               ) : (
-                <pre className={`p-3 rounded-lg text-sm font-mono overflow-x-auto mb-4 ${
-                  isDarkMode 
-                    ? 'bg-gray-800 text-gray-200' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
+                <pre 
+                  className={`p-3 rounded-lg text-sm font-mono overflow-x-auto mb-4 ${
+                    isDarkMode 
+                      ? 'bg-gray-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                  style={isDarkMode ? { color: '#e5e7eb' } : {}}
+                >
                   <code>{children}</code>
                 </pre>
               ),
             blockquote: ({ children }) => (
-              <blockquote className={`border-l-4 border-muted-indigo pl-4 italic mb-4 ${
-                isDarkMode 
-                  ? 'text-gray-300' 
-                  : 'text-slate-gray'
-              }`}>
+              <blockquote 
+                className={`border-l-4 border-muted-indigo pl-4 italic mb-4 ${
+                  !isDarkMode ? 'text-slate-gray' : ''
+                }`}
+                style={isDarkMode ? { color: '#d1d5db' } : {}}
+              >
                 {children}
               </blockquote>
             ),
@@ -857,10 +859,9 @@ const OnboardingWizard = () => {
                 target="_blank" 
                 rel="noopener noreferrer"
                 className={`underline font-medium transition-colors ${
-                  isDarkMode 
-                    ? 'text-blue-400 hover:text-blue-300' 
-                    : 'text-muted-indigo hover:text-muted-indigo/80'
+                  !isDarkMode ? 'text-muted-indigo hover:text-muted-indigo/80' : ''
                 }`}
+                style={isDarkMode ? { color: '#60a5fa' } : {}}
               >
                 {children}
               </a>
