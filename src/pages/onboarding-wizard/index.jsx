@@ -460,7 +460,7 @@ const OnboardingWizard = () => {
         
       } else if (response && response.structured_data === null && response.simple_answer) {
         // Structured data is null but we have a simple answer - workflow not processable
-        botReply = "Sorry, we are not able to process your workflow right now. Please try this in some time.";
+        botReply = response.simple_answer;
         
         setMessages(prevMessages => [
           ...prevMessages, 
