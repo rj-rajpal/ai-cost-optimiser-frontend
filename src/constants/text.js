@@ -3,7 +3,30 @@
 
 // Messages
 export const MESSAGES = {
-  CHAT_INITIAL: "Describe your project in detail and I'll help you optimize it.",
+  CHAT_INITIAL: `👋 **Hello! Welcome to Cost Architect**
+
+I'm your AI cost optimization advisor for enterprise AI workloads. Here's what I can help you with:
+
+## 🎯 **What I Do**
+- **Analyze your AI automation needs** and design optimal solutions
+- **Calculate costs** for different AI models (OpenAI, Anthropic, etc.)
+- **Recommend the best model** based on your requirements and budget
+- **Show ROI projections** and potential savings
+
+## 💬 **How to Get Started**
+Just describe your business process that you want to automate with AI. For example:
+
+- *"We process 500 support emails daily, need AI to tag priority and draft replies"*
+- *"Want to summarize 200 customer calls per day for our sales team"*
+- *"Need AI to analyze 1000 documents weekly for compliance issues"*
+
+## 📊 **What You'll Get**
+- Custom AI solution architecture
+- Cost comparison across multiple models
+- ROI analysis with payback projections
+- Clear recommendation for your specific use case
+
+**Ready to optimize your AI costs?** Tell me about the business process you'd like to automate! 🚀`,
   LOADING_PROJECT: "Loading project...",
   LOADING_PROJECT_DESCRIPTION: "Please wait while we load your project details.",
   CHAT_LOADING: "Generating...",
